@@ -177,12 +177,25 @@ const TPL=[
 const GN={m:1,s:2,d:3};
 
 /* ═══ GitHub Storage ═══ */
-function cfg(){return{
-  owner:localStorage.getItem('gh_owner')||'',
-  repo:localStorage.getItem('gh_repo')||'',
-  token:localStorage.getItem('gh_token')||'',
-  path:localStorage.getItem('gh_path')||'data.json'
-};}
+// Auto-detect owner/repo from GitHub Pages URL: {owner}.github.io/{repo}/
+function autoDetect(){
+  const m=location.hostname.match(/^(.+)\.github\.io$/);
+  if(m){
+    const owner=m[1];
+    const repo=location.pathname.split('/').filter(Boolean)[0]||'';
+    return{owner,repo};
+  }
+  return null;
+}
+function cfg(){
+  const auto=autoDetect();
+  return{
+    owner:localStorage.getItem('gh_owner')||(auto?auto.owner:''),
+    repo:localStorage.getItem('gh_repo')||(auto?auto.repo:''),
+    token:localStorage.getItem('gh_token')||'',
+    path:localStorage.getItem('gh_path')||'data.json'
+  };
+}
 function cfgOk(){const c=cfg();return c.owner&&c.repo&&c.token;}
 
 let ghSha=null; // track file SHA for updates
@@ -192,23 +205,18 @@ async function ghLoad(){
   if(!c.owner||!c.repo)return null;
   setSS('load','Загрузка…');
   try{
-    // Try raw content first (works without auth for public repos)
-    const url=`https://raw.githubusercontent.com/${c.owner}/${c.repo}/main/${c.path}?_=${Date.now()}`;
-    const r=await fetch(url);
+    // Use GitHub API — no cache, always fresh, works without auth for public repos
+    const hdrs={Accept:'application/vnd.github.v3+json'};
+    if(c.token)hdrs['Authorization']='token '+c.token;
+    const r=await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`,{headers:hdrs});
     if(!r.ok){setSS('','');return null;}
-    // Also get SHA for later updates
-    if(c.token){
-      try{
-        const ar=await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`,{
-          headers:{'Authorization':'token '+c.token}});
-        if(ar.ok){const aj=await ar.json();ghSha=aj.sha;}
-      }catch(e){}
-    }
-    const data=await r.json();
+    const j=await r.json();
+    ghSha=j.sha;
+    const data=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
     setSS('ok','Данные загружены');
     setTimeout(()=>setSS('',''),2000);
     return data;
-  }catch(e){setSS('err','Ошибка загрузки');return null;}
+  }catch(e){console.error(e);setSS('err','Ошибка загрузки');return null;}
 }
 
 async function ghSave(data){
