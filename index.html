@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Чек-лист БП проектов — ГК «Атера»</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--brd:#e0e3e8;--tx:#1a1f2b;--tx2:#4a5060;--tx3:#7c8494;
+--mg:#1e3a5f;--mg-l:#e8eef6;--sp:#0f766e;--sp-l:#e6f5f3;--dv:#6d28d9;--dv-l:#f0eafc;
+--yes:#16a34a;--no:#dc2626;--pt:#d97706;--ac:#1e293b;--sh:0 1px 3px rgba(0,0,0,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* Top bar */
+.top{background:var(--ac);color:#fff;padding:16px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top h1{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.top .sep{width:1px;height:24px;background:rgba(255,255,255,.15)}
+.tbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:6px 14px;color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:.12s}
+.tbtn:hover{background:rgba(255,255,255,.2)}
+.tbtn.act{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.35)}
+.tbtn.green{background:#16a34a;border-color:#16a34a}
+.tbtn.green:hover{background:#15803d}
+.tbtn.amber{background:#d97706;border-color:#d97706}
+.tbtn.amber:hover{background:#b45309}
+.top .spacer{flex:1}
+
+/* Project list */
+.plist{background:var(--card);border-bottom:1px solid var(--brd);padding:12px 32px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pchip{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid var(--brd);background:#fff;cursor:pointer;transition:.12s;color:var(--tx2);white-space:nowrap}
+.pchip:hover{border-color:#a0a6b2;background:#f8f9fb}
+.pchip.sel{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pchip .del{margin-left:6px;opacity:.5;font-size:13px}
+.pchip .del:hover{opacity:1;color:var(--no)}
+
+/* Header */
+.hdr{background:var(--card);border-bottom:1px solid var(--brd);padding:18px 32px}
+.hdr-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.hdr-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3)}
+.hdr-row input,.hdr-row select{border:1px solid var(--brd);border-radius:5px;padding:6px 10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--tx);outline:none;background:#fafbfc}
+.hdr-row input:focus{border-color:#94a3b8;background:#fff}
+.hdr-row input:read-only{background:#f0f1f4;color:var(--tx2);cursor:default}
+
+/* Legend + summary */
+.lbar{background:var(--card);border-bottom:1px solid var(--brd);padding:10px 32px;display:flex;gap:20px;align-items:center;font-size:11px;font-weight:600;color:var(--tx3);flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px}.ld{width:9px;height:9px;border-radius:2px}
+.sbar{background:var(--card);border-bottom:1px solid var(--brd);padding:10px 32px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.stt{display:flex;align-items:baseline;gap:4px}
+.snm{font-size:18px;font-weight:800;color:var(--ac)}
+.sla{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px}
+
+/* Content */
+.cnt{padding:18px 32px 60px;max-width:1520px}
+.pg{margin-bottom:24px}
+.gh{display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:8px 8px 0 0;color:#fff}
+.gh.m{background:var(--mg)}.gh.s{background:var(--sp)}.gh.d{background:var(--dv)}
+.gh h2{font-size:13px;font-weight:700;flex:1}.gh .gc{font-size:11px;font-weight:600;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:14px}
+
+.pt{width:100%;border-collapse:collapse;background:var(--card);border-radius:0 0 8px 8px;overflow:hidden;box-shadow:var(--sh)}
+.pt th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--tx3);padding:8px 10px;text-align:left;border-bottom:2px solid var(--brd);background:#fafbfc}
+.pt th.tc{text-align:center}
+.pt td{padding:7px 10px;border-bottom:1px solid var(--brd);font-size:12px;vertical-align:middle}
+.pt tr:last-child td{border-bottom:none}
+
+.cr td{font-weight:700;font-size:11px;letter-spacing:.2px;padding:6px 10px}
+.cr.m td{background:var(--mg-l);color:var(--mg);border-left:3px solid var(--mg)}
+.cr.s td{background:var(--sp-l);color:var(--sp);border-left:3px solid var(--sp)}
+.cr.d td{background:var(--dv-l);color:var(--dv);border-left:3px solid var(--dv)}
+
+.code{color:var(--tx3);font-size:11px;font-weight:700;text-align:center;white-space:nowrap}
+.pn{font-weight:600;color:var(--tx);line-height:1.35;font-size:12px}
+
+.ct{display:flex;justify-content:center;gap:3px}
+.cb{width:28px;height:24px;border:1.5px solid var(--brd);border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:.12s;color:var(--tx3);font-family:inherit}
+.cb:hover{border-color:#a0a6b2}
+.cb.y.a{background:#dcfce7;border-color:var(--yes);color:var(--yes)}
+.cb.p.a{background:#fef3c7;border-color:var(--pt);color:var(--pt)}
+.cb.n.a{background:#fee2e2;border-color:var(--no);color:var(--no)}
+.cb[disabled]{opacity:.5;cursor:default;pointer-events:none}
+
+/* Status badge for view mode */
+.sbadge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-align:center}
+.sbadge.sy{background:#dcfce7;color:var(--yes)}.sbadge.sp{background:#fef3c7;color:var(--pt)}
+.sbadge.sn{background:#fee2e2;color:var(--no)}.sbadge.su{background:#f0f1f4;color:var(--tx3)}
+
+.ef{width:100%;min-height:32px;border:1px solid var(--brd);border-radius:4px;padding:5px 8px;font-family:inherit;font-size:11.5px;color:var(--tx2);background:#fafbfc;resize:none;outline:none;overflow:hidden;line-height:1.4;display:block}
+.ef:hover{border-color:#aeb4c0}.ef:focus{border-color:#94a3b8;background:#fff}
+.ef::placeholder{color:#c5c9d2}
+.ef[readonly]{background:#f4f5f7;border-color:#eee;cursor:default}
+.ef[readonly]:hover{border-color:#eee}
+
+.vtext{font-size:11.5px;color:var(--tx2);line-height:1.4;min-height:20px}
+.vtext.empty{color:#ccc;font-style:italic}
+
+.add-btn{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--tx3);background:none;border:1px dashed var(--brd);border-radius:4px;padding:2px 7px;cursor:pointer;margin-top:4px;font-family:inherit}
+.add-btn:hover{color:var(--tx2);border-color:#aeb4c0;background:#f4f5f7}
+.sub-row td{border-bottom:1px solid #eeeff2;background:#fafafc}
+.rm-btn{font-size:15px;color:#ccc;cursor:pointer;border:none;background:none;padding:0 3px;font-family:inherit;line-height:1;flex-shrink:0}
+.rm-btn:hover{color:var(--no)}
+
+.fb{position:fixed;bottom:18px;right:18px;display:flex;gap:8px;z-index:100}
+.fb .tbtn{box-shadow:0 4px 12px rgba(0,0,0,.12);font-size:12px;padding:9px 16px}
+
+@media print{
+  .top,.plist,.fb,.add-btn,.rm-btn{display:none!important}
+  .hdr{padding:10px 14px}.cnt{padding:6px 14px}
+  .pt td,.pt th{padding:3px 5px;font-size:9.5px}
+  .ef{min-height:16px;padding:1px 3px;font-size:9px;border:1px solid #ddd!important;background:#fff!important;overflow:visible!important;height:auto!important}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media(max-width:900px){.top,.hdr,.cnt,.lbar,.sbar,.plist{padding-left:12px;padding-right:12px}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Чек-лист БП проектов</h1>
+  <span style="font-size:11px;color:rgba(255,255,255,.45);font-weight:500">ГК «Атера»</span>
+  <div class="spacer"></div>
+  <button class="tbtn green" onclick="newProject()">＋ Новый проект</button>
+</div>
+
+<div class="plist" id="plist"></div>
+
+<div class="hdr" id="hdr"></div>
+
+<div class="lbar">
+  <span style="color:var(--tx2)">Статус:</span>
+  <div class="li"><div class="ld" style="background:var(--yes)"></div>Выполняется</div>
+  <div class="li"><div class="ld" style="background:var(--pt)"></div>Частично</div>
+  <div class="li"><div class="ld" style="background:var(--no)"></div>Не выполняется</div>
+  <div class="li"><div class="ld" style="background:var(--brd)"></div>Не оценено</div>
+</div>
+
+<div class="sbar">
+  <div class="stt"><span class="snm" id="zt">0</span><span class="sla">всего</span></div>
+  <div class="stt"><span class="snm" id="zy" style="color:var(--yes)">0</span><span class="sla">выполняется</span></div>
+  <div class="stt"><span class="snm" id="zp" style="color:var(--pt)">0</span><span class="sla">частично</span></div>
+  <div class="stt"><span class="snm" id="zn" style="color:var(--no)">0</span><span class="sla">не выполняется</span></div>
+  <div class="stt"><span class="snm" id="zu" style="color:var(--tx3)">0</span><span class="sla">не оценено</span></div>
+</div>
+
+<div class="cnt" id="C"></div>
+
+<div class="fb" id="fb"></div>
+
+<script>
+/* ─── Process template ─── */
+const TPL=[
+{group:"1. УПРАВЛЯЮЩИЕ ПРОЦЕССЫ",cls:"m",cats:[
+{name:"Стратегическое управление",items:["Стратегическое планирование и целеполагание проекта","Инвестиционный анализ и финансовая модель проекта","Управление портфелем проектов и приоритизация"]},
+{name:"Бюджетное планирование и контроль",items:["Разработка и утверждение бюджета проекта (БДР, БДДС)","Мониторинг исполнения бюджета (план-факт анализ)","Актуализация бюджетов при изменении условий"]},
+{name:"Управление рисками и комплаенс",items:["Идентификация, оценка и митигация рисков проекта","Внутренний контроль и комплаенс"]},
+{name:"Управление эффективностью",items:["Система KPI проекта и мониторинг показателей","Управленческая отчётность для руководства и инвесторов"]},
+]},
+{group:"2. ПОДДЕРЖИВАЮЩИЕ ПРОЦЕССЫ",cls:"s",cats:[
+{name:"HR-менеджмент",items:["Организационное проектирование (оргструктура, штатное расписание, ФОТ)","Рекрутинг и наполнение квалифицированными кадрами","Адаптация и ввод в должность новых сотрудников","Кадровое делопроизводство (приём, переводы, увольнения, отпуска)","Охрана труда, СОУТ, инструктажи","Обучение и развитие персонала","Система оплаты труда и мотивации"]},
+{name:"Финансы и казначейство",items:["Управление ликвидностью и платёжный календарь","Формирование лимитов и контроль исполнения платежей","Проектное финансирование (кредитные линии, банки, эскроу)","Отчётность для банков (ковенанты)","Управленческий учёт по проекту (ОФР, ОДДС, баланс)","Финансовый контроль и согласование платежей","Ценообразование, нормирование и контроль затрат"]},
+{name:"Учёт и регламентированная отчётность",items:["Бухгалтерский учёт","Налоговый учёт","Учёт МПЗ и основных средств","Формирование регламентированной отчётности"]},
+{name:"Закупки и снабжение",items:["Консолидация потребности в закупках (план закупок)","Тендерные процедуры и выбор поставщика","Контрактация (договоры поставки и подряда)","Управление поставками, логистика, входной контроль","Складской учёт и управление запасами"]},
+{name:"Юридическая поддержка",items:["Правовая экспертиза договоров","Земельно-правовое сопровождение (права на землю, РнС, ввод в эксплуатацию)","Корпоративные процедуры (регистрация юрлиц, ЕГРЮЛ, доверенности)","Претензионно-исковая работа","Сопровождение 214-ФЗ (ДДУ, эскроу)","Взаимодействие с государственными и контролирующими органами"]},
+{name:"Информационные технологии",items:["Обеспечение ИТ-инфраструктурой (рабочие места, доступы, сети)","Сопровождение учётных и управленческих систем","Информационная безопасность и управление доступами"]},
+{name:"Административное обеспечение",items:["Документооборот и архивирование","Обеспечение офисными помещениями и объектовыми штабами"]},
+{name:"Безопасность",items:["Экономическая безопасность (проверка контрагентов, антифрод)","Физическая охрана объектов строительства"]},
+]},
+{group:"3. ПРОЦЕССЫ РАЗВИТИЯ",cls:"d",cats:[
+{name:"Оптимизация бизнес-процессов",items:["Описание и регламентация процессов (as-is / to-be)","Реинжиниринг и устранение узких мест","Развитие системы KPI и мотивации по процессам"]},
+{name:"Цифровизация и автоматизация",items:["Автоматизация учётных процессов (1С, БИТ.Финанс, интеграции)","Внедрение BI-аналитики и управленческих дашбордов","Электронный документооборот (ЭДО / КЭДО)","Цифровизация строительного контроля (мобильные решения, ПТО)"]},
+{name:"Инновации и R&D",items:["Внедрение новых технологий строительства","Развитие продуктовой линейки и стандартов качества"]},
+]},
+];
+
+const GN={m:1,s:2,d:3};
+
+/* ─── State ─── */
+let projects=JSON.parse(localStorage.getItem('atera_bp_projects')||'{}');
+let curId=localStorage.getItem('atera_bp_current')||null;
+let editMode=true;
+
+function saveAll(){
+  localStorage.setItem('atera_bp_projects',JSON.stringify(projects));
+  localStorage.setItem('atera_bp_current',curId||'');
+}
+
+/* ─── Project CRUD ─── */
+function newProject(){
+  const name=prompt('Название проекта:');
+  if(!name||!name.trim())return;
+  const id='p'+Date.now();
+  projects[id]={name:name.trim(),date:todayStr(),owner:'',rows:{}};
+  curId=id;editMode=true;saveAll();renderAll();
+}
+
+function openProject(id){
+  curId=id;editMode=false;saveAll();renderAll();
+}
+
+function delProject(id,e){
+  e.stopPropagation();
+  if(!confirm('Удалить проект «'+projects[id].name+'»?'))return;
+  delete projects[id];
+  if(curId===id)curId=Object.keys(projects)[0]||null;
+  saveAll();renderAll();
+}
+
+/* ─── Collect data from DOM into current project ─── */
+function collect(){
+  if(!curId||!projects[curId])return;
+  const p=projects[curId];
+  p.name=document.getElementById('inp_name')?.value||p.name;
+  p.date=document.getElementById('inp_date')?.value||p.date;
+  p.owner=document.getElementById('inp_owner')?.value||p.owner;
+  // Collect rows
+  p.rows={};
+  document.querySelectorAll('tr[data-rk]').forEach(tr=>{
+    const k=tr.dataset.rk;
+    const st=tr.querySelector('.cb.a');
+    const tas=tr.querySelectorAll('.ef');
+    p.rows[k]={
+      s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',
+      b:tas[0]?.value||'',
+      d:tas[1]?.value||'',
+      c:tas[2]?.value||''
+    };
+    // Sub-rows
+    let subs=[];
+    let nx=tr.nextElementSibling;
+    while(nx&&nx.dataset.parent===k){
+      const sst=nx.querySelector('.cb.a');
+      const stas=nx.querySelectorAll('.ef');
+      subs.push({
+        s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',
+        b:stas[0]?.value||'',
+        d:stas[1]?.value||'',
+        c:stas[2]?.value||''
+      });
+      nx=nx.nextElementSibling;
+    }
+    if(subs.length)p.rows[k].subs=subs;
+  });
+  saveAll();
+}
+
+/* ─── Render ─── */
+function renderAll(){
+  renderPlist();
+  renderHdr();
+  renderTable();
+  renderFb();
+  updC();
+}
+
+function renderPlist(){
+  const el=document.getElementById('plist');
+  const ids=Object.keys(projects);
+  if(!ids.length){el.innerHTML='<span style="font-size:12px;color:var(--tx3)">Нет проектов. Нажмите «Новый проект».</span>';return;}
+  el.innerHTML=ids.map(id=>{
+    const p=projects[id];
+    return `<div class="pchip ${id===curId?'sel':''}" onclick="openProject('${id}')">
+      ${esc(p.name)}
+      <span class="del" onclick="delProject('${id}',event)" title="Удалить">×</span>
+    </div>`;
+  }).join('');
+}
+
+function renderHdr(){
+  const el=document.getElementById('hdr');
+  if(!curId||!projects[curId]){el.innerHTML='';return;}
+  const p=projects[curId];
+  const ro=editMode?'':'readonly';
+  el.innerHTML=`<div class="hdr-row">
+    <label>Проект:</label><input id="inp_name" value="${esc(p.name)}" ${ro} style="width:300px" oninput="collect()">
+    <label>Дата:</label><input id="inp_date" value="${esc(p.date)}" ${ro} style="width:120px" oninput="collect()">
+    <label>Заполнил:</label><input id="inp_owner" value="${esc(p.owner)}" ${ro} style="width:240px" placeholder="ФИО, должность" oninput="collect()">
+    <span style="flex:1"></span>
+    <span style="font-size:11px;font-weight:600;color:${editMode?'var(--yes)':'var(--tx3)'};background:${editMode?'#dcfce7':'#f0f1f4'};padding:4px 10px;border-radius:4px">${editMode?'✎ Редактирование':'Просмотр'}</span>
+  </div>`;
+}
+
+function renderFb(){
+  const el=document.getElementById('fb');
+  if(!curId){el.innerHTML='';return;}
+  if(editMode){
+    el.innerHTML=`
+      <button class="tbtn" onclick="switchView()" style="background:#475569">👁 Просмотр</button>
+      <button class="tbtn green" onclick="doSave()">💾 Сохранить</button>
+      <button class="tbtn" onclick="window.print()">⎙ Печать</button>`;
+  } else {
+    el.innerHTML=`
+      <button class="tbtn amber" onclick="switchEdit()">✎ Редактировать</button>
+      <button class="tbtn" onclick="window.print()">⎙ Печать</button>`;
+  }
+}
+
+function switchEdit(){editMode=true;collect();renderAll();}
+function switchView(){collect();editMode=false;renderAll();}
+function doSave(){collect();renderAll();showToast('Сохранено');}
+
+function renderTable(){
+  const root=document.getElementById('C');
+  if(!curId||!projects[curId]){
+    root.innerHTML='<div style="text-align:center;padding:60px;color:var(--tx3);font-size:14px">Выберите или создайте проект</div>';
+    document.getElementById('zt').textContent=0;document.getElementById('zu').textContent=0;
+    return;
+  }
+  const p=projects[curId];
+  let html='',total=0;
+
+  TPL.forEach((g,gi)=>{
+    const gn=GN[g.cls];
+    let gc=0;g.cats.forEach(c=>gc+=c.items.length);total+=gc;
+    html+=`<div class="pg"><div class="gh ${g.cls}"><h2>${g.group}</h2><span class="gc">${gc}</span></div>`;
+    html+=`<table class="pt"><thead><tr>
+      <th class="tc" style="width:50px">№</th>
+      <th style="min-width:240px">Подпроцесс</th>
+      <th class="tc" style="width:100px">Статус</th>
+      <th style="width:170px">Ответственный блок</th>
+      <th style="width:180px">Ответств. подразделение</th>
+      <th style="width:200px">Комментарий</th>
+    </tr></thead><tbody>`;
+    let n=0;
+    g.cats.forEach((cat,ci)=>{
+      html+=`<tr class="cr ${g.cls}"><td colspan="6">${cat.name}</td></tr>`;
+      cat.items.forEach((item,ii)=>{
+        n++;
+        const code=gn+'.'+n;
+        const k=g.cls+'_'+n;
+        const rd=p.rows[k]||{s:'',b:'',d:'',c:''};
+        const subs=rd.subs||[];
+        const rs=1+subs.length;
+
+        html+=`<tr data-rk="${k}">
+          <td class="code" data-k="${k}" rowspan="${rs}">${code}</td>
+          <td style="vertical-align:middle" data-k="${k}" rowspan="${rs}">
+            <div class="pn">${item}</div>
+            ${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}
+          </td>
+          ${statusCell(rd.s)}
+          ${fieldCell(rd.b,'Блок')}
+          ${fieldCell(rd.d,'Подразделение')}
+          ${fieldCell(rd.c,'Комментарий')}
+        </tr>`;
+
+        subs.forEach((sr,si)=>{
+          html+=`<tr class="sub-row" data-parent="${k}">
+            ${statusCell(sr.s)}
+            ${fieldCell(sr.b,'Блок')}
+            ${fieldCell(sr.d,'Подразделение')}
+            <td style="vertical-align:middle">${editMode?`<div style="display:flex;gap:3px;align-items:start">
+              <textarea class="ef" rows="1" placeholder="За что отвечает">${esc(sr.c)}</textarea>
+              <button class="rm-btn" onclick="rmR(this)" title="Удалить">×</button>
+            </div>`:`<div class="vtext ${sr.c?'':'empty'}">${esc(sr.c)||'—'}</div>`}</td>
+          </tr>`;
+        });
+      });
+    });
+    html+=`</tbody></table></div>`;
+  });
+  root.innerHTML=html;
+  document.getElementById('zt').textContent=total;
+}
+
+function statusCell(s){
+  if(editMode){
+    return `<td style="text-align:center;vertical-align:middle"><div class="ct">
+      <button class="cb y ${s==='y'?'a':''}" onclick="tog(this)">✓</button>
+      <button class="cb p ${s==='p'?'a':''}" onclick="tog(this)">◐</button>
+      <button class="cb n ${s==='n'?'a':''}" onclick="tog(this)">✗</button>
+    </div></td>`;
+  }
+  if(s==='y')return '<td style="text-align:center"><span class="sbadge sy">Выполняется</span></td>';
+  if(s==='p')return '<td style="text-align:center"><span class="sbadge sp">Частично</span></td>';
+  if(s==='n')return '<td style="text-align:center"><span class="sbadge sn">Не выполняется</span></td>';
+  return '<td style="text-align:center"><span class="sbadge su">—</span></td>';
+}
+
+function fieldCell(val,ph){
+  if(editMode){
+    return `<td style="vertical-align:middle"><textarea class="ef" rows="1" placeholder="${ph}">${esc(val)}</textarea></td>`;
+  }
+  return `<td style="vertical-align:middle"><div class="vtext ${val?'':'empty'}">${esc(val)||'—'}</div></td>`;
+}
+
+/* ─── Interactions ─── */
+function tog(btn){
+  const was=btn.classList.contains('a');
+  btn.parentElement.querySelectorAll('.cb').forEach(b=>b.classList.remove('a'));
+  if(!was)btn.classList.add('a');
+  updC();
+}
+
+function updC(){
+  let y=0,p=0,n=0;
+  document.querySelectorAll('tr[data-rk] .cb.a').forEach(b=>{
+    if(b.classList.contains('y'))y++;else if(b.classList.contains('p'))p++;else if(b.classList.contains('n'))n++;
+  });
+  const t=+document.getElementById('zt').textContent;
+  document.getElementById('zy').textContent=y;
+  document.getElementById('zp').textContent=p;
+  document.getElementById('zn').textContent=n;
+  document.getElementById('zu').textContent=Math.max(0,t-y-p-n);
+}
+
+function addR(k){
+  collect(); // save current state first
+  const p=projects[curId];
+  if(!p.rows[k])p.rows[k]={s:'',b:'',d:'',c:''};
+  if(!p.rows[k].subs)p.rows[k].subs=[];
+  p.rows[k].subs.push({s:'',b:'',d:'',c:''});
+  saveAll();renderTable();updC();
+}
+
+function rmR(btn){
+  collect();
+  const tr=btn.closest('tr');
+  const k=tr.dataset.parent;
+  // find sub index
+  let idx=0,nx=document.getElementById('C').querySelector(`tr[data-rk="${k}"]`).nextElementSibling;
+  while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}
+  const p=projects[curId];
+  if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);
+  saveAll();renderTable();updC();
+}
+
+/* ─── Auto-resize ─── */
+document.addEventListener('input',function(e){
+  if(e.target.classList.contains('ef')){
+    e.target.style.height='auto';
+    e.target.style.height=Math.max(32,e.target.scrollHeight)+'px';
+  }
+});
+
+/* ─── Auto-save on changes ─── */
+let saveTimer;
+document.addEventListener('input',function(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>collect(),800);
+});
+
+/* ─── Helpers ─── */
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  Object.assign(t.style,{position:'fixed',bottom:'70px',right:'18px',background:'#1e293b',color:'#fff',padding:'8px 18px',borderRadius:'6px',fontSize:'13px',fontWeight:'600',fontFamily:'inherit',zIndex:'200',boxShadow:'0 4px 12px rgba(0,0,0,.15)',opacity:'0',transition:'opacity .2s'});
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.style.opacity='1');
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},1500);
+}
+
+/* ─── Before unload: save ─── */
+window.addEventListener('beforeunload',collect);
+
+/* ─── Init ─── */
+if(!curId||!projects[curId])curId=Object.keys(projects)[0]||null;
+if(curId)editMode=false;
+renderAll();
+</script>
+</body>
+</html>
