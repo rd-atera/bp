@@ -12,7 +12,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5;-webkit-font-smoothing:antialiased}
 
-.top{background:var(--ac);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top{background:var(--ac);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .top h1{font-size:16px;font-weight:800;letter-spacing:-.2px}
 .top .sub{font-size:11px;color:rgba(255,255,255,.4);font-weight:500}
 .top .spacer{flex:1}
@@ -91,7 +91,6 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .fb{position:fixed;bottom:16px;right:16px;display:flex;gap:6px;z-index:100}
 .fb .tbtn{box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:11.5px;padding:8px 14px}
 
-/* Modal */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:flex;align-items:center;justify-content:center}
 .modal{background:#fff;border-radius:10px;padding:24px;width:420px;max-width:92vw;box-shadow:0 20px 40px rgba(0,0,0,.15)}
 .modal h3{font-size:15px;font-weight:700;margin-bottom:12px}
@@ -101,13 +100,15 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .modal .hint{font-size:10.5px;color:var(--tx3);margin-top:3px;line-height:1.4}
 .modal .mbtns{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
 
-/* Sync indicator */
 .sync{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px}
-.sync.ok{background:#dcfce7;color:var(--yes)}.sync.err{background:#fee2e2;color:var(--no)}
-.sync.load{background:#fef3c7;color:var(--pt)}
+.sync.ok{background:#dcfce7;color:var(--yes)}.sync.err{background:#fee2e2;color:var(--no)}.sync.load{background:#fef3c7;color:var(--pt)}
+
+/* Debug bar */
+.dbg{background:#fffbeb;border-bottom:1px solid #fde68a;padding:6px 28px;font-size:10.5px;color:#92400e;font-weight:500;display:none}
+.dbg.show{display:block}
 
 @media print{
-  .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg{display:none!important}
+  .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg,.dbg{display:none!important}
   .hdr{padding:10px 14px}.cnt{padding:6px 14px}
   .pt td,.pt th{padding:3px 5px;font-size:9.5px}
   .ef{min-height:14px;padding:1px 3px;font-size:9px;border:1px solid #ddd!important;background:#fff!important;overflow:visible!important;height:auto!important}
@@ -123,10 +124,12 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
   <span class="sub">ГК «Атера»</span>
   <div class="spacer"></div>
   <span id="syncStatus"></span>
-  <button class="tbtn w" onclick="showSettings()">⚙ Настройки</button>
+  <button class="tbtn w" onclick="doReload()">↻ Обновить</button>
+  <button class="tbtn w" onclick="showSettings()">⚙</button>
   <button class="tbtn grn" onclick="newProject()">＋ Новый проект</button>
 </div>
 
+<div class="dbg" id="dbg"></div>
 <div class="plist" id="plist"></div>
 <div class="hdr" id="hdr"></div>
 
@@ -150,7 +153,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 <div id="modalRoot"></div>
 
 <script>
-/* ═══ Process Template ═══ */
+/* ═══ Template ═══ */
 const TPL=[
 {group:"1. УПРАВЛЯЮЩИЕ ПРОЦЕССЫ",cls:"m",cats:[
 {name:"Стратегическое управление",items:["Стратегическое планирование и целеполагание проекта","Инвестиционный анализ и финансовая модель проекта","Управление портфелем проектов и приоритизация"]},
@@ -176,132 +179,136 @@ const TPL=[
 ];
 const GN={m:1,s:2,d:3};
 
-/* ═══ GitHub Storage ═══ */
-// Auto-detect owner/repo from GitHub Pages URL: {owner}.github.io/{repo}/
+/* ═══ GitHub ═══ */
 function autoDetect(){
   const m=location.hostname.match(/^(.+)\.github\.io$/);
-  if(m){
-    const owner=m[1];
-    const repo=location.pathname.split('/').filter(Boolean)[0]||'';
-    return{owner,repo};
-  }
+  if(m){const o=m[1],r=location.pathname.split('/').filter(Boolean)[0]||'';return{owner:o,repo:r};}
   return null;
 }
 function cfg(){
-  const auto=autoDetect();
+  const a=autoDetect();
   return{
-    owner:localStorage.getItem('gh_owner')||(auto?auto.owner:''),
-    repo:localStorage.getItem('gh_repo')||(auto?auto.repo:''),
+    owner:localStorage.getItem('gh_owner')||(a?a.owner:''),
+    repo:localStorage.getItem('gh_repo')||(a?a.repo:''),
     token:localStorage.getItem('gh_token')||'',
     path:localStorage.getItem('gh_path')||'data.json'
   };
 }
-function cfgOk(){const c=cfg();return c.owner&&c.repo&&c.token;}
+let ghSha=null;
 
-let ghSha=null; // track file SHA for updates
+function dbg(msg){const el=document.getElementById('dbg');el.classList.add('show');el.textContent=msg;console.log('[DBG]',msg);}
 
 async function ghLoad(){
   const c=cfg();
-  if(!c.owner||!c.repo)return null;
+  if(!c.owner||!c.repo){dbg('GitHub не настроен: owner='+c.owner+' repo='+c.repo);return null;}
   setSS('load','Загрузка…');
+  dbg('Загрузка: '+c.owner+'/'+c.repo+'/'+c.path);
   try{
-    const hdrs={Accept:'application/vnd.github.v3+json'};
+    // Method: request RAW content directly from GitHub API (no base64)
+    const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
+    const hdrs={'Accept':'application/vnd.github.raw+json'};
     if(c.token)hdrs['Authorization']='token '+c.token;
-    const r=await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`,{headers:hdrs});
-    if(!r.ok){setSS('','');return null;}
-    const j=await r.json();
-    ghSha=j.sha;
-    // Robust base64 decode: strip ALL whitespace
-    const raw=atob(j.content.replace(/\s/g,''));
-    // Decode UTF-8
-    const bytes=new Uint8Array([...raw].map(c=>c.charCodeAt(0)));
-    const text=new TextDecoder('utf-8').decode(bytes);
-    const data=JSON.parse(text);
-    // Verify structure
-    const pcount=Object.keys(data).length;
-    let rcount=0;
-    Object.values(data).forEach(p=>{if(p&&p.rows)rcount+=Object.keys(p.rows).length;});
-    setSS('ok',`Загружено: ${pcount} проект(ов), ${rcount} записей`);
-    setTimeout(()=>setSS('',''),3000);
+    const r=await fetch(url,{headers:hdrs,cache:'no-store'});
+    if(!r.ok){
+      const status=r.status;
+      if(status===404){dbg('Файл data.json не найден в репо — это нормально для первого запуска');setSS('','');return null;}
+      dbg('Ошибка API: HTTP '+status);setSS('err','HTTP '+status);return null;
+    }
+    const data=await r.json();
+
+    // Get SHA separately for future saves
+    try{
+      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json',...(c.token?{'Authorization':'token '+c.token}:{})}});
+      if(mr.ok){const mj=await mr.json();ghSha=mj.sha;}
+    }catch(e){}
+
+    // Diagnostics
+    const pkeys=Object.keys(data);
+    let totalRows=0;
+    pkeys.forEach(pk=>{if(data[pk]&&data[pk].rows)totalRows+=Object.keys(data[pk].rows).length;});
+    dbg('OK: '+pkeys.length+' проект(ов), '+totalRows+' строк с данными. Ключи: '+pkeys.join(', '));
+
+    if(totalRows>0)setSS('ok','Загружено ✓');
+    else setSS('ok','Загружено (строки пустые)');
+    setTimeout(()=>setSS('',''),4000);
     return data;
-  }catch(e){console.error('ghLoad error:',e);setSS('err','Ошибка: '+e.message);return null;}
+  }catch(e){dbg('Ошибка загрузки: '+e.message);setSS('err',e.message);return null;}
 }
 
 async function ghSave(data){
   const c=cfg();
-  if(!c.owner||!c.repo||!c.token){setSS('err','Настройте GitHub');return false;}
+  if(!c.owner||!c.repo||!c.token){setSS('err','Настройте GitHub (токен)');return false;}
   setSS('load','Сохранение…');
+
+  // Diagnostics before save
+  const pkeys=Object.keys(data);
+  let totalRows=0;
+  pkeys.forEach(pk=>{if(data[pk]&&data[pk].rows)totalRows+=Object.keys(data[pk].rows).length;});
+  dbg('Сохранение: '+pkeys.length+' проект(ов), '+totalRows+' строк');
+
   try{
-    // Get current SHA if we don't have it
+    const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
+    // Get current SHA
     if(!ghSha){
       try{
-        const gr=await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`,{
-          headers:{'Authorization':'token '+c.token}});
+        const gr=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}});
         if(gr.ok){const gj=await gr.json();ghSha=gj.sha;}
       }catch(e){}
     }
-    const body={
-      message:'Обновление чек-листа БП',
-      content:btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2)))),
-    };
+    // Encode JSON → UTF-8 → base64
+    const jsonStr=JSON.stringify(data,null,2);
+    const bytes=new TextEncoder().encode(jsonStr);
+    let bin='';for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+    const b64=btoa(bin);
+
+    const body={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
     if(ghSha)body.sha=ghSha;
-    const r=await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`,{
-      method:'PUT',
-      headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},
-      body:JSON.stringify(body)
-    });
-    if(!r.ok){const e=await r.text();console.error(e);setSS('err','Ошибка сохранения');return false;}
+    const r=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){const t=await r.text();dbg('Ошибка сохранения: '+r.status+' '+t);setSS('err','Ошибка '+r.status);return false;}
     const j=await r.json();
     ghSha=j.content.sha;
+    dbg('Сохранено! SHA: '+ghSha.substring(0,8));
     setSS('ok','Сохранено ✓');
-    setTimeout(()=>setSS('',''),2500);
+    setTimeout(()=>setSS('',''),3000);
     return true;
-  }catch(e){console.error(e);setSS('err','Ошибка сети');return false;}
+  }catch(e){dbg('Ошибка сети: '+e.message);setSS('err',e.message);return false;}
 }
 
-function setSS(type,msg){
-  const el=document.getElementById('syncStatus');
-  if(!msg){el.innerHTML='';return;}
-  el.innerHTML=`<span class="sync ${type}">${msg}</span>`;
-}
+function setSS(t,m){const el=document.getElementById('syncStatus');if(!m){el.innerHTML='';return;}el.innerHTML=`<span class="sync ${t}">${m}</span>`;}
 
 /* ═══ State ═══ */
 let projects={};
 let curId=null;
 let editMode=false;
 
-function localSave(){localStorage.setItem('atera_bp_loc',JSON.stringify({projects,curId}));}
-function localLoad(){try{const d=JSON.parse(localStorage.getItem('atera_bp_loc')||'{}');if(d.projects)projects=d.projects;if(d.curId)curId=d.curId;}catch(e){}}
+function localSave(){localStorage.setItem('atera_bp_v2',JSON.stringify({projects,curId}));}
+function localLoad(){try{const d=JSON.parse(localStorage.getItem('atera_bp_v2')||'{}');if(d.projects)projects=d.projects;if(d.curId)curId=d.curId;}catch(e){}}
 
-/* ═══ Project CRUD ═══ */
+/* ═══ CRUD ═══ */
 function newProject(){
-  const name=prompt('Название проекта:');
-  if(!name||!name.trim())return;
+  const n=prompt('Название проекта:');if(!n||!n.trim())return;
   const id='p'+Date.now();
-  projects[id]={name:name.trim(),date:todayStr(),owner:'',rows:{}};
+  projects[id]={name:n.trim(),date:todayStr(),owner:'',rows:{}};
   curId=id;editMode=true;localSave();renderAll();
 }
 function openProject(id){curId=id;editMode=false;localSave();renderAll();}
 function delProject(id,e){
-  e.stopPropagation();
-  if(!confirm('Удалить проект «'+projects[id].name+'»?'))return;
-  delete projects[id];
-  if(curId===id)curId=Object.keys(projects)[0]||null;
+  e.stopPropagation();if(!confirm('Удалить «'+projects[id].name+'»?'))return;
+  delete projects[id];if(curId===id)curId=Object.keys(projects)[0]||null;
   localSave();renderAll();
 }
 
-/* ═══ Collect DOM → state ═══ */
+/* ═══ Collect (ONLY in edit mode) ═══ */
 function collect(){
   if(!curId||!projects[curId]||!editMode)return;
   const p=projects[curId];
   p.name=document.getElementById('inp_name')?.value||p.name;
   p.date=document.getElementById('inp_date')?.value||p.date;
   p.owner=document.getElementById('inp_owner')?.value||p.owner;
-  // Only collect rows if table has editable fields
-  const rows=document.querySelectorAll('tr[data-rk]');
-  if(!rows.length)return;
+  const trs=document.querySelectorAll('tr[data-rk]');
+  if(!trs.length)return; // guard: no table rendered
   p.rows={};
-  rows.forEach(tr=>{
+  trs.forEach(tr=>{
     const k=tr.dataset.rk;
     const st=tr.querySelector('.cb.a');
     const tas=tr.querySelectorAll('.ef');
@@ -321,13 +328,10 @@ function collect(){
 function renderAll(){renderPlist();renderHdr();renderTable();renderFb();updC();}
 
 function renderPlist(){
-  const el=document.getElementById('plist');
-  const ids=Object.keys(projects);
-  if(!ids.length){el.innerHTML='<span style="font-size:11px;color:var(--tx3)">Нет проектов. Нажмите «Новый проект».</span>';return;}
-  el.innerHTML=ids.map(id=>`<div class="pchip ${id===curId?'sel':''}" onclick="openProject('${id}')">
-    ${esc(projects[id].name)}<span class="x" onclick="delProject('${id}',event)" title="Удалить">×</span></div>`).join('');
+  const el=document.getElementById('plist'),ids=Object.keys(projects);
+  if(!ids.length){el.innerHTML='<span style="font-size:11px;color:var(--tx3)">Нет проектов</span>';return;}
+  el.innerHTML=ids.map(id=>`<div class="pchip ${id===curId?'sel':''}" onclick="openProject('${id}')">${esc(projects[id].name)}<span class="x" onclick="delProject('${id}',event)">×</span></div>`).join('');
 }
-
 function renderHdr(){
   const el=document.getElementById('hdr');
   if(!curId||!projects[curId]){el.innerHTML='';return;}
@@ -340,60 +344,47 @@ function renderHdr(){
     <span style="font-size:10px;font-weight:700;color:${editMode?'var(--yes)':'var(--tx3)'};background:${editMode?'#dcfce7':'#f0f1f4'};padding:3px 9px;border-radius:4px">${editMode?'✎ Редактирование':'👁 Просмотр'}</span>
   </div>`;
 }
-
 function renderFb(){
   const el=document.getElementById('fb');
   if(!curId){el.innerHTML='';return;}
   if(editMode){
-    el.innerHTML=`<button class="tbtn ghost" onclick="switchView()">👁 Просмотр</button>
-      <button class="tbtn grn" onclick="doSave()">💾 Сохранить</button>
-      <button class="tbtn out" onclick="window.print()">⎙ Печать</button>`;
-  } else {
-    el.innerHTML=`<button class="tbtn amb" onclick="switchEdit()">✎ Редактировать</button>
-      <button class="tbtn out" onclick="window.print()">⎙ Печать</button>`;
+    el.innerHTML=`<button class="tbtn ghost" onclick="switchView()">👁 Просмотр</button><button class="tbtn grn" onclick="doSave()">💾 Сохранить</button><button class="tbtn out" onclick="window.print()">⎙ Печать</button>`;
+  }else{
+    el.innerHTML=`<button class="tbtn amb" onclick="switchEdit()">✎ Редактировать</button><button class="tbtn out" onclick="window.print()">⎙ Печать</button>`;
   }
 }
-
 function switchEdit(){editMode=true;renderAll();}
 function switchView(){collect();editMode=false;renderAll();}
 async function doSave(){
   collect();
   const ok=await ghSave(projects);
-  if(!ok&&!cfgOk()){
-    if(confirm('GitHub не настроен. Данные сохранены локально.\n\nНастроить GitHub для общего доступа?'))showSettings();
-  }
-  renderAll();
+  if(!ok&&!cfg().token){if(confirm('Токен не настроен. Настроить?'))showSettings();}
+  renderPlist();
+}
+async function doReload(){
+  const d=await ghLoad();
+  if(d&&typeof d==='object'){projects=d;if(!curId||!projects[curId])curId=Object.keys(projects)[0]||null;localSave();editMode=false;renderAll();}
+  else{toast('Нет данных на сервере');}
 }
 
 function renderTable(){
   const root=document.getElementById('C');
-  if(!curId||!projects[curId]){root.innerHTML='<div style="text-align:center;padding:50px;color:var(--tx3);font-size:13px">Выберите или создайте проект</div>';document.getElementById('zt').textContent=0;document.getElementById('zu').textContent=0;return;}
+  if(!curId||!projects[curId]){root.innerHTML='<div style="text-align:center;padding:50px;color:var(--tx3)">Выберите или создайте проект</div>';document.getElementById('zt').textContent=0;document.getElementById('zu').textContent=0;return;}
   const p=projects[curId];let html='',total=0;
-
   TPL.forEach((g,gi)=>{
     const gn=GN[g.cls];let gc=0;g.cats.forEach(c=>gc+=c.items.length);total+=gc;
     html+=`<div class="pg"><div class="gh ${g.cls}"><h2>${g.group}</h2><span class="gc">${gc}</span></div>`;
-    html+=`<table class="pt"><thead><tr>
-      <th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th>
-      <th class="tc" style="width:100px">Статус</th><th style="width:165px">Ответственный блок</th>
-      <th style="width:175px">Ответств. подразделение</th><th style="width:195px">Комментарий</th>
-    </tr></thead><tbody>`;
+    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th><th class="tc" style="width:100px">Статус</th><th style="width:165px">Ответственный блок</th><th style="width:175px">Ответств. подразделение</th><th style="width:195px">Комментарий</th></tr></thead><tbody>`;
     let n=0;
     g.cats.forEach((cat,ci)=>{
       html+=`<tr class="cr ${g.cls}"><td colspan="6">${cat.name}</td></tr>`;
       cat.items.forEach((item,ii)=>{
         n++;const code=gn+'.'+n,k=g.cls+'_'+n;
-        const rd=p.rows[k]||{s:'',b:'',d:'',c:''};const subs=rd.subs||[];const rs=1+subs.length;
-        html+=`<tr data-rk="${k}">
-          <td class="code" data-k="${k}" rowspan="${rs}">${code}</td>
-          <td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>
-          ${sCell(rd.s)}${fCell(rd.b,'Блок')}${fCell(rd.d,'Подразделение')}${fCell(rd.c,'Комментарий')}
-        </tr>`;
+        const rd=p.rows[k]||{s:'',b:'',d:'',c:''};
+        const subs=rd.subs||[];const rs=1+subs.length;
+        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${fCell(rd.b,'Блок')}${fCell(rd.d,'Подразделение')}${fCell(rd.c,'Комментарий')}</tr>`;
         subs.forEach(sr=>{
-          html+=`<tr class="sub-row" data-parent="${k}">
-            ${sCell(sr.s)}${fCell(sr.b,'Блок')}${fCell(sr.d,'Подразделение')}
-            <td style="vertical-align:middle">${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="За что отвечает">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td>
-          </tr>`;
+          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${fCell(sr.b,'Блок')}${fCell(sr.d,'Подразделение')}<td style="vertical-align:middle">${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="За что отвечает">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
         });
       });
     });
@@ -401,58 +392,41 @@ function renderTable(){
   });
   root.innerHTML=html;document.getElementById('zt').textContent=total;
 }
-
 function sCell(s){
-  if(editMode)return `<td style="text-align:center;vertical-align:middle"><div class="ct"><button class="cb y ${s==='y'?'a':''}" onclick="tog(this)">✓</button><button class="cb p ${s==='p'?'a':''}" onclick="tog(this)">◐</button><button class="cb n ${s==='n'?'a':''}" onclick="tog(this)">✗</button></div></td>`;
-  if(s==='y')return '<td style="text-align:center"><span class="sb sy">Да</span></td>';
-  if(s==='p')return '<td style="text-align:center"><span class="sb sp">Частично</span></td>';
-  if(s==='n')return '<td style="text-align:center"><span class="sb sn">Нет</span></td>';
-  return '<td style="text-align:center"><span class="sb su">—</span></td>';
+  if(editMode)return`<td style="text-align:center;vertical-align:middle"><div class="ct"><button class="cb y ${s==='y'?'a':''}" onclick="tog(this)">✓</button><button class="cb p ${s==='p'?'a':''}" onclick="tog(this)">◐</button><button class="cb n ${s==='n'?'a':''}" onclick="tog(this)">✗</button></div></td>`;
+  if(s==='y')return'<td style="text-align:center"><span class="sb sy">Да</span></td>';
+  if(s==='p')return'<td style="text-align:center"><span class="sb sp">Частично</span></td>';
+  if(s==='n')return'<td style="text-align:center"><span class="sb sn">Нет</span></td>';
+  return'<td style="text-align:center"><span class="sb su">—</span></td>';
 }
 function fCell(v,ph){
-  if(editMode)return `<td style="vertical-align:middle"><textarea class="ef" rows="1" placeholder="${ph}">${esc(v)}</textarea></td>`;
-  return `<td style="vertical-align:middle"><div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
+  if(editMode)return`<td style="vertical-align:middle"><textarea class="ef" rows="1" placeholder="${ph}">${esc(v)}</textarea></td>`;
+  return`<td style="vertical-align:middle"><div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
 
 /* ═══ Interactions ═══ */
 function tog(btn){const w=btn.classList.contains('a');btn.parentElement.querySelectorAll('.cb').forEach(b=>b.classList.remove('a'));if(!w)btn.classList.add('a');updC();}
-
 function updC(){
-  let y=0,p=0,n=0;
-  document.querySelectorAll('tr[data-rk] .cb.a').forEach(b=>{if(b.classList.contains('y'))y++;else if(b.classList.contains('p'))p++;else if(b.classList.contains('n'))n++;});
+  let y=0,p=0,n=0;document.querySelectorAll('tr[data-rk] .cb.a').forEach(b=>{if(b.classList.contains('y'))y++;else if(b.classList.contains('p'))p++;else if(b.classList.contains('n'))n++;});
   const t=+document.getElementById('zt').textContent;
-  document.getElementById('zy').textContent=y;document.getElementById('zp').textContent=p;
-  document.getElementById('zn').textContent=n;document.getElementById('zu').textContent=Math.max(0,t-y-p-n);
+  document.getElementById('zy').textContent=y;document.getElementById('zp').textContent=p;document.getElementById('zn').textContent=n;document.getElementById('zu').textContent=Math.max(0,t-y-p-n);
 }
-
 function addR(k){collect();const p=projects[curId];if(!p.rows[k])p.rows[k]={s:'',b:'',d:'',c:''};if(!p.rows[k].subs)p.rows[k].subs=[];p.rows[k].subs.push({s:'',b:'',d:'',c:''});localSave();renderTable();updC();}
+function rmR(btn){collect();const tr=btn.closest('tr'),k=tr.dataset.parent;let idx=0,nx=document.querySelector(`tr[data-rk="${k}"]`).nextElementSibling;while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}const p=projects[curId];if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);localSave();renderTable();updC();}
 
-function rmR(btn){
-  collect();const tr=btn.closest('tr'),k=tr.dataset.parent;
-  let idx=0,nx=document.querySelector(`tr[data-rk="${k}"]`).nextElementSibling;
-  while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}
-  const p=projects[curId];if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);
-  localSave();renderTable();updC();
-}
-
-/* ═══ Settings Modal ═══ */
+/* ═══ Settings ═══ */
 function showSettings(){
   const c=cfg();
-  document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()">
-    <div class="modal">
-      <h3>⚙ Настройки GitHub</h3>
-      <p style="font-size:11.5px;color:var(--tx2);line-height:1.5">Для общего доступа данные сохраняются в GitHub-репозиторий. Укажите репозиторий и Personal Access Token с правами на запись.</p>
-      <label>Владелец (owner)</label><input id="s_owner" value="${esc(c.owner)}" placeholder="rd-atera">
-      <label>Репозиторий</label><input id="s_repo" value="${esc(c.repo)}" placeholder="atera-bp">
-      <label>Файл данных</label><input id="s_path" value="${esc(c.path)}" placeholder="data.json">
-      <label>Personal Access Token</label><input id="s_token" value="${esc(c.token)}" placeholder="ghp_..." type="password">
-      <div class="hint">Создайте токен: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained → Contents: Read and Write</div>
-      <div class="mbtns">
-        <button class="tbtn ghost" onclick="closeModal()">Отмена</button>
-        <button class="tbtn grn" onclick="saveSettings()">Сохранить</button>
-      </div>
-    </div>
-  </div>`;
+  document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <h3>⚙ Настройки GitHub</h3>
+    <p style="font-size:11.5px;color:var(--tx2);line-height:1.5">Для общего доступа данные хранятся в GitHub. Owner и repo определяются автоматически из URL сайта. Токен нужен только для сохранения.</p>
+    <label>Владелец (owner)</label><input id="s_owner" value="${esc(c.owner)}" placeholder="rd-atera">
+    <label>Репозиторий</label><input id="s_repo" value="${esc(c.repo)}" placeholder="bp">
+    <label>Файл данных</label><input id="s_path" value="${esc(c.path)}" placeholder="data.json">
+    <label>Personal Access Token (для сохранения)</label><input id="s_token" value="${esc(c.token)}" placeholder="github_pat_..." type="password">
+    <div class="hint">GitHub → Settings → Developer settings → Personal access tokens → Fine-grained → Contents: Read and Write</div>
+    <div class="mbtns"><button class="tbtn ghost" onclick="closeModal()">Отмена</button><button class="tbtn grn" onclick="saveSettings()">Сохранить</button></div>
+  </div></div>`;
 }
 function closeModal(){document.getElementById('modalRoot').innerHTML='';}
 function saveSettings(){
@@ -463,29 +437,24 @@ function saveSettings(){
   closeModal();toast('Настройки сохранены');
 }
 
-/* ═══ Auto-resize ═══ */
+/* ═══ Util ═══ */
 document.addEventListener('input',function(e){if(e.target.classList.contains('ef')){e.target.style.height='auto';e.target.style.height=Math.max(30,e.target.scrollHeight)+'px';}});
-
-/* ═══ Helpers ═══ */
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function toast(msg){const t=document.createElement('div');t.textContent=msg;Object.assign(t.style,{position:'fixed',bottom:'60px',right:'16px',background:'#1e293b',color:'#fff',padding:'7px 16px',borderRadius:'6px',fontSize:'12px',fontWeight:'600',fontFamily:'inherit',zIndex:'200',boxShadow:'0 4px 12px rgba(0,0,0,.15)',opacity:'0',transition:'opacity .2s'});document.body.appendChild(t);requestAnimationFrame(()=>t.style.opacity='1');setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},1800);}
 
-window.addEventListener('beforeunload',collect);
-
 /* ═══ Init ═══ */
 (async function(){
-  localLoad(); // load from localStorage first (instant)
-  // Then try GitHub for shared data
-  const ghData=await ghLoad();
-  if(ghData&&typeof ghData==='object'){
-    // Merge: GitHub is source of truth
-    projects=ghData;
+  localLoad();
+  renderAll(); // show local data immediately
+  const d=await ghLoad();
+  if(d&&typeof d==='object'){
+    projects=d;
     if(!curId||!projects[curId])curId=Object.keys(projects)[0]||null;
     localSave();
+    editMode=false;
+    renderAll(); // re-render with server data
   }
-  if(!curId||!projects[curId])curId=Object.keys(projects)[0]||null;
-  renderAll();
 })();
 </script>
 </body>
