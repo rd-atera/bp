@@ -205,18 +205,26 @@ async function ghLoad(){
   if(!c.owner||!c.repo)return null;
   setSS('load','Загрузка…');
   try{
-    // Use GitHub API — no cache, always fresh, works without auth for public repos
     const hdrs={Accept:'application/vnd.github.v3+json'};
     if(c.token)hdrs['Authorization']='token '+c.token;
     const r=await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`,{headers:hdrs});
     if(!r.ok){setSS('','');return null;}
     const j=await r.json();
     ghSha=j.sha;
-    const data=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
-    setSS('ok','Данные загружены');
-    setTimeout(()=>setSS('',''),2000);
+    // Robust base64 decode: strip ALL whitespace
+    const raw=atob(j.content.replace(/\s/g,''));
+    // Decode UTF-8
+    const bytes=new Uint8Array([...raw].map(c=>c.charCodeAt(0)));
+    const text=new TextDecoder('utf-8').decode(bytes);
+    const data=JSON.parse(text);
+    // Verify structure
+    const pcount=Object.keys(data).length;
+    let rcount=0;
+    Object.values(data).forEach(p=>{if(p&&p.rows)rcount+=Object.keys(p.rows).length;});
+    setSS('ok',`Загружено: ${pcount} проект(ов), ${rcount} записей`);
+    setTimeout(()=>setSS('',''),3000);
     return data;
-  }catch(e){console.error(e);setSS('err','Ошибка загрузки');return null;}
+  }catch(e){console.error('ghLoad error:',e);setSS('err','Ошибка: '+e.message);return null;}
 }
 
 async function ghSave(data){
@@ -284,13 +292,16 @@ function delProject(id,e){
 
 /* ═══ Collect DOM → state ═══ */
 function collect(){
-  if(!curId||!projects[curId])return;
+  if(!curId||!projects[curId]||!editMode)return;
   const p=projects[curId];
   p.name=document.getElementById('inp_name')?.value||p.name;
   p.date=document.getElementById('inp_date')?.value||p.date;
   p.owner=document.getElementById('inp_owner')?.value||p.owner;
+  // Only collect rows if table has editable fields
+  const rows=document.querySelectorAll('tr[data-rk]');
+  if(!rows.length)return;
   p.rows={};
-  document.querySelectorAll('tr[data-rk]').forEach(tr=>{
+  rows.forEach(tr=>{
     const k=tr.dataset.rk;
     const st=tr.querySelector('.cb.a');
     const tas=tr.querySelectorAll('.ef');
