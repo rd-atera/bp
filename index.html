@@ -265,7 +265,7 @@ function cfg(){
   return{
     owner:a?a.owner:'rd-atera',
     repo:a?a.repo:'bp',
-    token:'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',
+    token:'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',
     path:'data.json'
   };
 }
@@ -281,7 +281,7 @@ async function ghLoad(){
   try{
     const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
     const hdrs={'Accept':'application/vnd.github.raw+json'};
-    if(c.token)hdrs['Authorization']='Bearer '+c.token;
+    if(c.token)hdrs['Authorization']='token '+c.token;
     const r=await fetch(url,{headers:hdrs,cache:'no-store'});
     if(!r.ok){
       const status=r.status;
@@ -294,7 +294,7 @@ async function ghLoad(){
     const data=await r.json();
     // Get SHA separately
     try{
-      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json','Authorization':'Bearer '+c.token}});
+      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json','Authorization':'token '+c.token}});
       if(mr.ok){const mj=await mr.json();ghSha=mj.sha;}
     }catch(e){}
     const pkeys=Object.keys(data);
@@ -320,7 +320,7 @@ async function ghSave(data){
     const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
     if(!ghSha){
       try{
-        const gr=await fetch(url,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.v3+json'}});
+        const gr=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}});
         if(gr.ok){const gj=await gr.json();ghSha=gj.sha;}
         else{const t=await gr.text();dbg('⚠️ SHA fetch: HTTP '+gr.status+' '+t.substring(0,150));}
       }catch(e){dbg('⚠️ SHA fetch error: '+e.message);}
@@ -331,7 +331,7 @@ async function ghSave(data){
     const b64=btoa(bin);
     const body={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
     if(ghSha)body.sha=ghSha;
-    const r=await fetch(url,{method:'PUT',headers:{'Authorization':'Bearer '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!r.ok){const t=await r.text();dbg('❌ Сохранение: HTTP '+r.status+' '+t.substring(0,300));setSS('err','Ошибка '+r.status);return false;}
     const j=await r.json();
     ghSha=j.content.sha;
@@ -446,17 +446,17 @@ function renderTable(){
   TPL.forEach((g,gi)=>{
     const gn=GN[g.cls];let gc=0;g.cats.forEach(c=>gc+=c.items.length);total+=gc;
     html+=`<div class="pg"><div class="gh ${g.cls}"><h2>${g.group}</h2><span class="gc">${gc}</span></div>`;
-    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th><th class="tc" style="width:100px">Статус</th><th style="width:165px">Ответственный блок</th><th style="width:175px">Ответств. подразделение</th><th style="width:195px">Комментарий</th></tr></thead><tbody>`;
+    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th><th class="tc" style="width:100px">Статус</th><th style="width:165px">Ответственный блок</th><th style="width:195px">Комментарий</th></tr></thead><tbody>`;
     let n=0;
     g.cats.forEach((cat,ci)=>{
-      html+=`<tr class="cr ${g.cls}"><td colspan="6">${cat.name}</td></tr>`;
+      html+=`<tr class="cr ${g.cls}"><td colspan="5">${cat.name}</td></tr>`;
       cat.items.forEach((item,ii)=>{
         n++;const code=gn+'.'+n,k=g.cls+'_'+n;
         const rd=p.rows[k]||{s:'',b:'',d:'',c:''};
         const subs=rd.subs||[];const rs=1+subs.length;
-        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${fCell(rd.d,'Подразделение')}${fCell(rd.c,'Комментарий')}</tr>`;
+        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${fCell(rd.c,'Комментарий')}</tr>`;
         subs.forEach(sr=>{
-          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}${fCell(sr.d,'Подразделение')}<td style="vertical-align:middle">${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="За что отвечает">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
+          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}<td style="vertical-align:middle">${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
         });
       });
     });
