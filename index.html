@@ -107,7 +107,8 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .sync.ok{background:#dcfce7;color:var(--yes)}.sync.err{background:#fee2e2;color:var(--no)}.sync.load{background:#fef3c7;color:var(--pt)}
 
 /* Debug bar */
-.dbg{display:none!important}
+.dbg{background:#fffbeb;border-bottom:1px solid #fde68a;padding:6px 28px;font-size:10.5px;color:#92400e;font-weight:500;display:none}
+.dbg.show{display:block}
 
 /* Framework diagram */
 .fw-toggle{background:var(--card);border-bottom:1px solid var(--brd);padding:8px 28px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
@@ -152,44 +153,48 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 </div>
 <div class="fw-panel" id="fwPanel">
   <div class="fw-svg-wrap">
-    <svg viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;min-width:320px">
+    <svg viewBox="0 0 860 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;min-width:320px">
       <!-- 1. Управляющие -->
-      <rect x="180" y="8" width="500" height="52" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
-      <text x="430" y="40" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="15" font-weight="800" letter-spacing=".5">УПРАВЛЯЮЩИЕ ПРОЦЕССЫ</text>
+      <rect x="130" y="8" width="600" height="110" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="430" y="34" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="15" font-weight="800" letter-spacing=".5">УПРАВЛЯЮЩИЕ ПРОЦЕССЫ</text>
+      <text x="280" y="58" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Стратегическое управление</text>
+      <text x="280" y="78" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Бюджетное планирование и контроль</text>
+      <text x="580" y="58" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Управление рисками и комплаенс</text>
+      <text x="580" y="78" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Управление эффективностью</text>
 
       <!-- Стрелка вниз -->
-      <line x1="430" y1="60" x2="430" y2="84" stroke="#1a1f2b" stroke-width="1.5"/>
-      <polyline points="424,78 430,85 436,78" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
+      <line x1="430" y1="118" x2="430" y2="142" stroke="#1a1f2b" stroke-width="1.5"/>
+      <polyline points="424,136 430,143 436,136" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
 
       <!-- 2. Основные -->
-      <rect x="80" y="88" width="700" height="60" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
-      <text x="430" y="115" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="15" font-weight="800" letter-spacing=".5">ОСНОВНЫЕ ПРОЦЕССЫ ПРОЕКТА</text>
-      <text x="430" y="137" text-anchor="middle" fill="#555" font-family="Manrope,sans-serif" font-size="12" font-weight="500">Зависят от направления — девелопмент, ИТ-проекты, услуги, производство</text>
+      <rect x="80" y="146" width="700" height="60" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="430" y="173" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="15" font-weight="800" letter-spacing=".5">ОСНОВНЫЕ ПРОЦЕССЫ ПРОЕКТА</text>
+      <text x="430" y="195" text-anchor="middle" fill="#555" font-family="Manrope,sans-serif" font-size="12" font-weight="500">Зависят от направления — девелопмент, ИТ-проекты, услуги, производство</text>
 
       <!-- Стрелки вверх -->
-      <line x1="220" y1="172" x2="220" y2="152" stroke="#1a1f2b" stroke-width="1.5"/>
-      <polyline points="214,158 220,152 226,158" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
-      <line x1="640" y1="172" x2="640" y2="152" stroke="#1a1f2b" stroke-width="1.5"/>
-      <polyline points="634,158 640,152 646,158" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
+      <line x1="220" y1="230" x2="220" y2="210" stroke="#1a1f2b" stroke-width="1.5"/>
+      <polyline points="214,216 220,210 226,216" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
+      <line x1="640" y1="230" x2="640" y2="210" stroke="#1a1f2b" stroke-width="1.5"/>
+      <polyline points="634,216 640,210 646,216" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
 
       <!-- 3. Поддерживающие -->
-      <rect x="30" y="176" width="380" height="150" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
-      <text x="220" y="200" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="14" font-weight="800" letter-spacing=".5">ПОДДЕРЖИВАЮЩИЕ ПРОЦЕССЫ</text>
-      <text x="120" y="224" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">HR-менеджмент</text>
-      <text x="120" y="244" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Финансы и казначейство</text>
-      <text x="120" y="264" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Учёт и отчётность</text>
-      <text x="120" y="284" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Закупки и снабжение</text>
-      <text x="310" y="224" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Юридическая поддержка</text>
-      <text x="310" y="244" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Информационные технологии</text>
-      <text x="310" y="264" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Адм. обеспечение</text>
-      <text x="310" y="284" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Безопасность</text>
+      <rect x="30" y="234" width="380" height="170" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="220" y="260" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="14" font-weight="800" letter-spacing=".5">ПОДДЕРЖИВАЮЩИЕ ПРОЦЕССЫ</text>
+      <text x="120" y="286" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">HR-менеджмент</text>
+      <text x="120" y="306" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Финансы и казначейство</text>
+      <text x="120" y="326" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Учёт и отчётность</text>
+      <text x="120" y="346" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Закупки и снабжение</text>
+      <text x="310" y="286" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Юридическая поддержка</text>
+      <text x="310" y="306" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Информационные технологии</text>
+      <text x="310" y="326" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Адм. обеспечение</text>
+      <text x="310" y="346" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Безопасность</text>
 
       <!-- 4. Развитие -->
-      <rect x="450" y="176" width="380" height="150" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
-      <text x="640" y="200" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="14" font-weight="800" letter-spacing=".5">ПРОЦЕССЫ РАЗВИТИЯ</text>
-      <text x="640" y="232" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Оптимизация бизнес-процессов</text>
-      <text x="640" y="252" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Цифровизация и автоматизация</text>
-      <text x="640" y="272" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Инновации и R&amp;D</text>
+      <rect x="450" y="234" width="380" height="170" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="640" y="260" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="14" font-weight="800" letter-spacing=".5">ПРОЦЕССЫ РАЗВИТИЯ</text>
+      <text x="640" y="294" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Оптимизация бизнес-процессов</text>
+      <text x="640" y="314" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Цифровизация и автоматизация</text>
+      <text x="640" y="334" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Инновации и R&amp;D</text>
     </svg>
   </div>
   <div class="fw-note"></div>
@@ -260,7 +265,7 @@ function cfg(){
   return{
     owner:a?a.owner:'rd-atera',
     repo:a?a.repo:'bp',
-    token:'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',
+    token:'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',
     path:'data.json'
   };
 }
@@ -270,78 +275,71 @@ function dbg(msg){const el=document.getElementById('dbg');el.classList.add('show
 
 async function ghLoad(){
   const c=cfg();
-  if(!c.owner||!c.repo){dbg('GitHub не настроен: owner='+c.owner+' repo='+c.repo);return null;}
+  if(!c.owner||!c.repo){dbg('❌ GitHub не настроен: owner='+c.owner+' repo='+c.repo);return null;}
   setSS('load','Загрузка…');
-  dbg('Загрузка: '+c.owner+'/'+c.repo+'/'+c.path);
+  dbg('⏳ Загрузка: '+c.owner+'/'+c.repo+'/'+c.path+' | Токен: '+(c.token?c.token.substring(0,15)+'…':'НЕТ'));
   try{
-    // Method: request RAW content directly from GitHub API (no base64)
     const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
     const hdrs={'Accept':'application/vnd.github.raw+json'};
     if(c.token)hdrs['Authorization']='Bearer '+c.token;
     const r=await fetch(url,{headers:hdrs,cache:'no-store'});
     if(!r.ok){
       const status=r.status;
-      if(status===404){dbg('Файл data.json не найден в репо — это нормально для первого запуска');setSS('','');return null;}
-      dbg('Ошибка API: HTTP '+status);setSS('err','HTTP '+status);return null;
+      const body=await r.text().catch(()=>'');
+      if(status===404){dbg('ℹ️ data.json не найден — первый запуск. Repo: '+c.owner+'/'+c.repo);setSS('','');return null;}
+      if(status===401){dbg('❌ 401 Unauthorized. Токен невалидный или нет доступа к repo '+c.owner+'/'+c.repo+'. Ответ: '+body.substring(0,200));setSS('err','401 — проверьте токен');return null;}
+      if(status===403){dbg('❌ 403 Forbidden. Токен без нужных прав или rate limit. Ответ: '+body.substring(0,200));setSS('err','403');return null;}
+      dbg('❌ HTTP '+status+': '+body.substring(0,200));setSS('err','HTTP '+status);return null;
     }
     const data=await r.json();
-
-    // Get SHA separately for future saves
+    // Get SHA separately
     try{
-      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json',...(c.token?{'Authorization':'Bearer '+c.token}:{})}});
+      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json','Authorization':'Bearer '+c.token}});
       if(mr.ok){const mj=await mr.json();ghSha=mj.sha;}
     }catch(e){}
-
-    // Diagnostics
     const pkeys=Object.keys(data);
     let totalRows=0;
     pkeys.forEach(pk=>{if(data[pk]&&data[pk].rows)totalRows+=Object.keys(data[pk].rows).length;});
-    dbg('OK: '+pkeys.length+' проект(ов), '+totalRows+' строк с данными. Ключи: '+pkeys.join(', '));
-
+    dbg('✅ Загружено: '+pkeys.length+' проект(ов), '+totalRows+' строк. Ключи: '+pkeys.join(', '));
     if(totalRows>0)setSS('ok','Загружено ✓');
     else setSS('ok','Загружено (строки пустые)');
     setTimeout(()=>setSS('',''),4000);
     return data;
-  }catch(e){dbg('Ошибка загрузки: '+e.message);setSS('err',e.message);return null;}
+  }catch(e){dbg('❌ Сеть: '+e.message);setSS('err',e.message);return null;}
 }
 
 async function ghSave(data){
   const c=cfg();
-  if(!c.owner||!c.repo||!c.token){setSS('err','Настройте GitHub (токен)');return false;}
+  if(!c.owner||!c.repo||!c.token){dbg('❌ Сохранение невозможно: owner='+c.owner+' repo='+c.repo+' token='+(c.token?'есть':'НЕТ'));setSS('err','Нет токена');return false;}
   setSS('load','Сохранение…');
-
-  // Diagnostics before save
   const pkeys=Object.keys(data);
   let totalRows=0;
   pkeys.forEach(pk=>{if(data[pk]&&data[pk].rows)totalRows+=Object.keys(data[pk].rows).length;});
-  dbg('Сохранение: '+pkeys.length+' проект(ов), '+totalRows+' строк');
-
+  dbg('⏳ Сохранение: '+pkeys.length+' проект(ов), '+totalRows+' строк → '+c.owner+'/'+c.repo+'/'+c.path);
   try{
     const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
-    // Get current SHA
     if(!ghSha){
       try{
         const gr=await fetch(url,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.v3+json'}});
         if(gr.ok){const gj=await gr.json();ghSha=gj.sha;}
-      }catch(e){}
+        else{const t=await gr.text();dbg('⚠️ SHA fetch: HTTP '+gr.status+' '+t.substring(0,150));}
+      }catch(e){dbg('⚠️ SHA fetch error: '+e.message);}
     }
-    // Encode JSON → UTF-8 → base64
     const jsonStr=JSON.stringify(data,null,2);
     const bytes=new TextEncoder().encode(jsonStr);
     let bin='';for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
     const b64=btoa(bin);
-
     const body={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
     if(ghSha)body.sha=ghSha;
     const r=await fetch(url,{method:'PUT',headers:{'Authorization':'Bearer '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!r.ok){const t=await r.text();dbg('Ошибка сохранения: '+r.status+' '+t);setSS('err','Ошибка '+r.status);return false;}
+    if(!r.ok){const t=await r.text();dbg('❌ Сохранение: HTTP '+r.status+' '+t.substring(0,300));setSS('err','Ошибка '+r.status);return false;}
     const j=await r.json();
     ghSha=j.content.sha;
-    dbg('Сохранено! SHA: '+ghSha.substring(0,8));
+    dbg('✅ Сохранено! SHA: '+ghSha.substring(0,8));
     setSS('ok','Сохранено ✓');
     setTimeout(()=>setSS('',''),3000);
     return true;
-  }catch(e){dbg('Ошибка сети: '+e.message);setSS('err',e.message);return false;}
+  }catch(e){dbg('❌ Сеть: '+e.message);setSS('err',e.message);return false;}
 }
 
 function setSS(t,m){const el=document.getElementById('syncStatus');if(!m){el.innerHTML='';return;}el.innerHTML=`<span class="sync ${t}">${m}</span>`;}
