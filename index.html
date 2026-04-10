@@ -277,7 +277,7 @@ async function ghLoad(){
     // Method: request RAW content directly from GitHub API (no base64)
     const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
     const hdrs={'Accept':'application/vnd.github.raw+json'};
-    if(c.token)hdrs['Authorization']='token '+c.token;
+    if(c.token)hdrs['Authorization']='Bearer '+c.token;
     const r=await fetch(url,{headers:hdrs,cache:'no-store'});
     if(!r.ok){
       const status=r.status;
@@ -288,7 +288,7 @@ async function ghLoad(){
 
     // Get SHA separately for future saves
     try{
-      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json',...(c.token?{'Authorization':'token '+c.token}:{})}});
+      const mr=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json',...(c.token?{'Authorization':'Bearer '+c.token}:{})}});
       if(mr.ok){const mj=await mr.json();ghSha=mj.sha;}
     }catch(e){}
 
@@ -321,7 +321,7 @@ async function ghSave(data){
     // Get current SHA
     if(!ghSha){
       try{
-        const gr=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}});
+        const gr=await fetch(url,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.v3+json'}});
         if(gr.ok){const gj=await gr.json();ghSha=gj.sha;}
       }catch(e){}
     }
@@ -333,7 +333,7 @@ async function ghSave(data){
 
     const body={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
     if(ghSha)body.sha=ghSha;
-    const r=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r=await fetch(url,{method:'PUT',headers:{'Authorization':'Bearer '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!r.ok){const t=await r.text();dbg('Ошибка сохранения: '+r.status+' '+t);setSS('err','Ошибка '+r.status);return false;}
     const j=await r.json();
     ghSha=j.content.sha;
