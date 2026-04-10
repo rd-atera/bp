@@ -107,8 +107,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .sync.ok{background:#dcfce7;color:var(--yes)}.sync.err{background:#fee2e2;color:var(--no)}.sync.load{background:#fef3c7;color:var(--pt)}
 
 /* Debug bar */
-.dbg{background:#fffbeb;border-bottom:1px solid #fde68a;padding:6px 28px;font-size:10.5px;color:#92400e;font-weight:500;display:none}
-.dbg.show{display:block}
+.dbg{display:none!important}
 
 /* Framework diagram */
 .fw-toggle{background:var(--card);border-bottom:1px solid var(--brd);padding:8px 28px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
@@ -119,8 +118,8 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .fw-toggle .hint{font-size:10px;font-weight:500;color:var(--tx3);margin-left:8px}
 .fw-panel{background:var(--card);border-bottom:1px solid var(--brd);padding:24px 28px 28px;display:none}
 .fw-panel.open{display:block}
-.fw-svg-wrap{max-width:860px;margin:0 auto}
-.fw-note{font-size:10.5px;color:var(--tx3);text-align:center;margin-top:14px;line-height:1.5;max-width:700px;margin-left:auto;margin-right:auto}
+.fw-svg-wrap{max-width:960px;margin:0 auto}
+.fw-note{display:none}
 
 @media print{
   .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg,.dbg,.fw-toggle,.fw-panel{display:none!important}
@@ -141,7 +140,6 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
   <div class="spacer"></div>
   <span id="syncStatus"></span>
   <button class="tbtn w" onclick="doReload()">↻ Обновить</button>
-  <button class="tbtn w" onclick="showSettings()">⚙</button>
   <button class="tbtn grn" onclick="newProject()">＋ Новый проект</button>
 </div>
 
@@ -154,67 +152,53 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 </div>
 <div class="fw-panel" id="fwPanel">
   <div class="fw-svg-wrap">
-    <svg viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
-      <defs>
-        <filter id="ds" x="-2%" y="-2%" width="104%" height="108%"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.07"/></filter>
-      </defs>
-
+    <svg viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;min-width:320px">
       <!-- 1. Управляющие -->
-      <rect x="180" y="8" width="500" height="64" rx="6" fill="#1e3a5f" filter="url(#ds)"/>
-      <text x="430" y="33" text-anchor="middle" fill="#fff" font-family="Manrope,sans-serif" font-size="13" font-weight="800" letter-spacing="1">УПРАВЛЯЮЩИЕ ПРОЦЕССЫ</text>
-      <text x="430" y="52" text-anchor="middle" fill="rgba(255,255,255,.55)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Стратегия · Бюджетирование · KPI · Управление рисками · Управленческий учёт и отчётность</text>
+      <rect x="180" y="8" width="500" height="52" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="430" y="40" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="15" font-weight="800" letter-spacing=".5">УПРАВЛЯЮЩИЕ ПРОЦЕССЫ</text>
 
-      <!-- Стрелка вниз от управляющих к основным -->
-      <line x1="430" y1="72" x2="430" y2="96" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
-      <polyline points="424,89 430,96 436,89" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+      <!-- Стрелка вниз -->
+      <line x1="430" y1="60" x2="430" y2="84" stroke="#1a1f2b" stroke-width="1.5"/>
+      <polyline points="424,78 430,85 436,78" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
 
-      <!-- 2. Основные (увеличен, текст внутри) -->
-      <rect x="80" y="100" width="700" height="82" rx="6" fill="#fff" stroke="#e0e3e8" stroke-width="1.5" filter="url(#ds)"/>
-      <text x="430" y="124" text-anchor="middle" fill="#1e293b" font-family="Manrope,sans-serif" font-size="13" font-weight="800" letter-spacing=".5">ОСНОВНЫЕ ПРОЦЕССЫ ПРОЕКТА</text>
-      <text x="430" y="146" text-anchor="middle" fill="#64748b" font-family="Manrope,sans-serif" font-size="12" font-style="italic">Процессы, создающие ценность и приносящие прибыль</text>
-      <text x="430" y="166" text-anchor="middle" fill="#94a3b8" font-family="Manrope,sans-serif" font-size="11" font-style="italic">Зависят от направления — девелопмент, ИТ-проекты, услуги для граждан, производство и др.</text>
+      <!-- 2. Основные -->
+      <rect x="80" y="88" width="700" height="60" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="430" y="115" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="15" font-weight="800" letter-spacing=".5">ОСНОВНЫЕ ПРОЦЕССЫ ПРОЕКТА</text>
+      <text x="430" y="137" text-anchor="middle" fill="#555" font-family="Manrope,sans-serif" font-size="12" font-weight="500">Зависят от направления — девелопмент, ИТ-проекты, услуги, производство</text>
 
-      <!-- Стрелки ВВЕРХ от поддерживающих и развития к основным -->
-      <line x1="220" y1="210" x2="220" y2="186" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
-      <polyline points="214,193 220,186 226,193" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
-      <line x1="640" y1="210" x2="640" y2="186" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
-      <polyline points="634,193 640,186 646,193" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+      <!-- Стрелки вверх -->
+      <line x1="220" y1="172" x2="220" y2="152" stroke="#1a1f2b" stroke-width="1.5"/>
+      <polyline points="214,158 220,152 226,158" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
+      <line x1="640" y1="172" x2="640" y2="152" stroke="#1a1f2b" stroke-width="1.5"/>
+      <polyline points="634,158 640,152 646,158" stroke="#1a1f2b" stroke-width="1.5" fill="none"/>
 
-      <!-- 3. Поддерживающие (тексты отцентрированы) -->
-      <rect x="30" y="214" width="380" height="156" rx="6" fill="#0f766e" filter="url(#ds)"/>
-      <text x="220" y="240" text-anchor="middle" fill="#fff" font-family="Manrope,sans-serif" font-size="12" font-weight="800" letter-spacing=".8">ПОДДЕРЖИВАЮЩИЕ ПРОЦЕССЫ</text>
-      <text x="120" y="264" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">HR-менеджмент</text>
-      <text x="120" y="282" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Финансы и казначейство</text>
-      <text x="120" y="300" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Регламентир. учёт и отчётность</text>
-      <text x="120" y="318" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Закупки и снабжение</text>
-      <text x="310" y="264" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Юридическая поддержка</text>
-      <text x="310" y="282" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Информационные технологии</text>
-      <text x="310" y="300" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Адм. обеспечение</text>
-      <text x="310" y="318" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Безопасность</text>
-      <text x="220" y="356" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Manrope,sans-serif" font-size="8.5" font-style="italic">Обеспечивают ресурсами и сервисами все проекты</text>
+      <!-- 3. Поддерживающие -->
+      <rect x="30" y="176" width="380" height="150" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="220" y="200" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="14" font-weight="800" letter-spacing=".5">ПОДДЕРЖИВАЮЩИЕ ПРОЦЕССЫ</text>
+      <text x="120" y="224" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">HR-менеджмент</text>
+      <text x="120" y="244" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Финансы и казначейство</text>
+      <text x="120" y="264" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Учёт и отчётность</text>
+      <text x="120" y="284" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Закупки и снабжение</text>
+      <text x="310" y="224" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Юридическая поддержка</text>
+      <text x="310" y="244" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Информационные технологии</text>
+      <text x="310" y="264" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Адм. обеспечение</text>
+      <text x="310" y="284" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Безопасность</text>
 
-      <!-- 4. Развитие (тексты отцентрированы) -->
-      <rect x="450" y="214" width="380" height="156" rx="6" fill="#6d28d9" filter="url(#ds)"/>
-      <text x="640" y="240" text-anchor="middle" fill="#fff" font-family="Manrope,sans-serif" font-size="12" font-weight="800" letter-spacing=".8">ПРОЦЕССЫ РАЗВИТИЯ</text>
-      <text x="640" y="268" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Оптимизация бизнес-процессов</text>
-      <text x="640" y="286" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Цифровизация и автоматизация</text>
-      <text x="640" y="304" text-anchor="middle" fill="rgba(255,255,255,.75)" font-family="Manrope,sans-serif" font-size="10" font-weight="500">Инновации и R&amp;D</text>
-      <text x="640" y="356" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Manrope,sans-serif" font-size="8.5" font-style="italic">Повышают зрелость и эффективность процессов</text>
+      <!-- 4. Развитие -->
+      <rect x="450" y="176" width="380" height="150" rx="6" fill="#fff" stroke="#1a1f2b" stroke-width="2"/>
+      <text x="640" y="200" text-anchor="middle" fill="#1a1f2b" font-family="Manrope,sans-serif" font-size="14" font-weight="800" letter-spacing=".5">ПРОЦЕССЫ РАЗВИТИЯ</text>
+      <text x="640" y="232" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Оптимизация бизнес-процессов</text>
+      <text x="640" y="252" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Цифровизация и автоматизация</text>
+      <text x="640" y="272" text-anchor="middle" fill="#333" font-family="Manrope,sans-serif" font-size="11.5" font-weight="500">Инновации и R&amp;D</text>
     </svg>
   </div>
-  <div class="fw-note">Схема отражает архитектуру бизнес-процессов, необходимых для реализации каждого проекта ГК «Атера». <b style="color:#1e3a5f">Управляющие процессы</b> задают цели, формируют бюджеты, обеспечивают управленческий учёт и контролируют результат. <b style="color:#0f766e">Поддерживающие процессы</b> обеспечивают проект ресурсами: кадрами, финансами, регламентированным учётом, закупками, юридической и ИТ-поддержкой. <b style="color:#6d28d9">Процессы развития</b> направлены на повышение зрелости и эффективности самих процессов. Основные процессы проекта формируются отдельно проектными командами и зависят от направления — девелопмент, ИТ-проекты, услуги для граждан, производство и др.</div>
+  <div class="fw-note"></div>
 </div>
 
 <div class="plist" id="plist"></div>
-<div class="hdr" id="hdr"></div>
+<div class="hdr" id="hdr" style="display:none"></div>
 
-<div class="lbar">
-  <span style="color:var(--tx2)">Статус:</span>
-  <div class="li"><div class="ld" style="background:var(--yes)"></div>Выполняется</div>
-  <div class="li"><div class="ld" style="background:var(--pt)"></div>Частично</div>
-  <div class="li"><div class="ld" style="background:var(--no)"></div>Не выполняется</div>
-  <div class="li"><div class="ld" style="background:var(--brd)"></div>Не оценено</div>
-</div>
+<div class="lbar" style="display:none"></div>
 <div class="sbar">
   <div class="stt"><span class="snm" id="zt">0</span><span class="sla">всего</span></div>
   <div class="stt"><span class="snm" id="zy" style="color:var(--yes)">0</span><span class="sla">выполняется</span></div>
@@ -227,7 +211,18 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 <div class="fb" id="fb"></div>
 <div id="modalRoot"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
+/* ═══ Auto-save ═══ */
+let _saveTm=null;
+function autoSave(){collect();updC();clearTimeout(_saveTm);_saveTm=setTimeout(()=>{ghSave(projects).catch(()=>{});},2000);}
+/* ═══ PDF Download ═══ */
+function downloadPDF(){
+  collect();const wasEdit=editMode;editMode=false;renderAll();
+  const el=document.getElementById('C');
+  const pName=curId&&projects[curId]?projects[curId].name:'checklist';
+  html2pdf().set({margin:[8,4,8,4],filename:'Чек-лист_БП_'+pName+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all','css','legacy']}}).from(el).save().then(()=>{editMode=wasEdit;renderAll();});
+}
 /* ═══ Template ═══ */
 const TPL=[
 {group:"1. УПРАВЛЯЮЩИЕ ПРОЦЕССЫ",cls:"m",cats:[
@@ -238,7 +233,7 @@ const TPL=[
 ]},
 {group:"2. ПОДДЕРЖИВАЮЩИЕ ПРОЦЕССЫ",cls:"s",cats:[
 {name:"HR-менеджмент",items:["Организационное проектирование (оргструктура, штатное расписание, ФОТ)","Рекрутинг и наполнение квалифицированными кадрами","Адаптация и ввод в должность новых сотрудников","Кадровое делопроизводство (приём, переводы, увольнения, отпуска)","Обучение и развитие персонала","Система оплаты труда и мотивации"]},
-{name:"Финансы и казначейство",items:["Управление ликвидностью и платёжный календарь","Формирование лимитов и контроль исполнения платежей","Проведение платежей и расчёты с контрагентами","Контроль и сверка исполнения платежей","Расчёты с персоналом (начисление ЗП, налоги, отчётность)","Проектное финансирование (кредитные линии, банки, эскроу)","Отчётность для банков (ковенанты)","Ценообразование, нормирование и контроль затрат"]},
+{name:"Финансы и казначейство",items:["Управление ликвидностью и платёжный календарь","Проведение платежей и расчёты с контрагентами","Контроль и сверка исполнения платежей","Расчёты с персоналом (начисление ЗП, налоги, отчётность)","Проектное финансирование (кредитные линии, банки, эскроу)","Отчётность для банков (ковенанты)","Ценообразование, нормирование и контроль затрат"]},
 {name:"Учёт и регламентированная отчётность",items:["Бухгалтерский учёт","Налоговый учёт","Учёт МПЗ и основных средств","Формирование регламентированной отчётности"]},
 {name:"Закупки и снабжение",items:["Консолидация потребности в закупках (план закупок)","Тендерные процедуры и выбор поставщика","Контрактация (договоры поставки и подряда)","Управление поставками, логистика, входной контроль","Складской учёт и управление запасами"]},
 {name:"Юридическая поддержка",items:["Правовая экспертиза договоров","Земельно-правовое сопровождение (права на землю, РнС, ввод в эксплуатацию)","Корпоративные процедуры (регистрация юрлиц, ЕГРЮЛ, доверенности)","Претензионно-исковая работа","Взаимодействие с государственными и контролирующими органами"]},
@@ -263,10 +258,10 @@ function autoDetect(){
 function cfg(){
   const a=autoDetect();
   return{
-    owner:localStorage.getItem('gh_owner')||(a?a.owner:''),
-    repo:localStorage.getItem('gh_repo')||(a?a.repo:''),
-    token:localStorage.getItem('gh_token')||'',
-    path:localStorage.getItem('gh_path')||'data.json'
+    owner:a?a.owner:'rd-atera',
+    repo:a?a.repo:'bp',
+    token:'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',
+    path:'data.json'
   };
 }
 let ghSha=null;
@@ -377,22 +372,25 @@ function delProject(id,e){
 function collect(){
   if(!curId||!projects[curId]||!editMode)return;
   const p=projects[curId];
-  p.name=document.getElementById('inp_name')?.value||p.name;
-  p.date=document.getElementById('inp_date')?.value||p.date;
-  p.owner=document.getElementById('inp_owner')?.value||p.owner;
+  const nameEl=document.getElementById('inp_name');
+  if(nameEl){p.name=nameEl.value||p.name;p.date=document.getElementById('inp_date')?.value||p.date;p.owner=document.getElementById('inp_owner')?.value||p.owner;}
   const trs=document.querySelectorAll('tr[data-rk]');
-  if(!trs.length)return; // guard: no table rendered
+  if(!trs.length)return;
   p.rows={};
   trs.forEach(tr=>{
     const k=tr.dataset.rk;
     const st=tr.querySelector('.cb.a');
     const bf=tr.querySelector('.bf');
-    const tas=tr.querySelectorAll('.ef');
-    p.rows[k]={s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',b:bf?.value||'',d:tas[0]?.value||'',c:tas[1]?.value||''};
+    const custIn=tr.querySelector('.bCustIn');
+    const bVal=(bf&&bf.value==='__custom__'&&custIn)?custIn.value:(bf?.value||'');
+    const tas=tr.querySelectorAll('.ef:not(.bCustIn)');
+    p.rows[k]={s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',b:bVal,d:tas[0]?.value||'',c:tas[1]?.value||''};
     let subs=[],nx=tr.nextElementSibling;
     while(nx&&nx.dataset.parent===k){
-      const sst=nx.querySelector('.cb.a');const sbf=nx.querySelector('.bf');const stas=nx.querySelectorAll('.ef');
-      subs.push({s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',b:sbf?.value||'',d:stas[0]?.value||'',c:stas[1]?.value||''});
+      const sst=nx.querySelector('.cb.a');const sbf=nx.querySelector('.bf');const sCustIn=nx.querySelector('.bCustIn');
+      const sBVal=(sbf&&sbf.value==='__custom__'&&sCustIn)?sCustIn.value:(sbf?.value||'');
+      const stas=nx.querySelectorAll('.ef:not(.bCustIn)');
+      subs.push({s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',b:sBVal,d:stas[0]?.value||'',c:stas[1]?.value||''});
       nx=nx.nextElementSibling;
     }
     if(subs.length)p.rows[k].subs=subs;
@@ -424,9 +422,9 @@ function renderFb(){
   const el=document.getElementById('fb');
   if(!curId){el.innerHTML='';return;}
   if(editMode){
-    el.innerHTML=`<button class="tbtn ghost" onclick="switchView()">👁 Просмотр</button><button class="tbtn grn" onclick="doSave()">💾 Сохранить</button><button class="tbtn out" onclick="window.print()">⎙ Печать</button>`;
+    el.innerHTML=`<button class="tbtn ghost" onclick="switchView()">👁 Просмотр</button><button class="tbtn grn" onclick="doSave()">💾 Сохранить на сервер</button><button class="tbtn out" onclick="downloadPDF()">📥 Скачать PDF</button>`;
   }else{
-    el.innerHTML=`<button class="tbtn amb" onclick="switchEdit()">✎ Редактировать</button><button class="tbtn out" onclick="window.print()">⎙ Печать</button>`;
+    el.innerHTML=`<button class="tbtn amb" onclick="switchEdit()">✎ Редактировать</button><button class="tbtn out" onclick="downloadPDF()">📥 Скачать PDF</button>`;
   }
 }
 function switchEdit(){editMode=true;renderAll();}
@@ -479,27 +477,33 @@ function fCell(v,ph){
   if(editMode)return`<td style="vertical-align:middle"><textarea class="ef" rows="1" placeholder="${ph}">${esc(v)}</textarea></td>`;
   return`<td style="vertical-align:middle"><div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
-const BLOCKS=['','Финансово-экономический блок','Центр бухгалтерского обслуживания','HR-блок','Блок ИТ','Блок безопасности','Блок закупок','Юридический блок','Иное'];
+const BLOCKS=['','Финансово-экономический блок','Центр бухгалтерского обслуживания','HR-блок','Блок ИТ','Блок безопасности','Блок закупок','Юридический блок','Блок «Девелопмент»','__custom__'];
 function bCell(v){
   if(editMode){
-    let h='<td style="vertical-align:middle"><select class="bf">';
+    const isCustom=v&&!BLOCKS.includes(v);
+    let h='<td style="vertical-align:middle"><div>';
+    h+='<select class="bf" onchange="bCustToggle(this)">';
     h+='<option value="">— Выберите блок —</option>';
-    BLOCKS.forEach(b=>{if(b)h+=`<option value="${esc(b)}"${v===b?' selected':''}>${esc(b)}</option>`;});
-    h+='</select></td>';return h;
+    BLOCKS.forEach(b=>{if(b&&b!=='__custom__')h+=`<option value="${esc(b)}"${v===b?' selected':''}>${esc(b)}</option>`;});
+    h+=`<option value="__custom__"${isCustom?' selected':''}>Другое (ввести)</option>`;
+    h+='</select>';
+    h+=`<input class="ef bCustIn" style="margin-top:3px;${isCustom?'':'display:none;'}" placeholder="Введите название блока" value="${isCustom?esc(v):''}">`;
+    h+='</div></td>';return h;
   }
   return`<td style="vertical-align:middle"><div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
+function bCustToggle(sel){const inp=sel.parentElement.querySelector('.bCustIn');if(sel.value==='__custom__'){inp.style.display='';inp.focus();}else{inp.style.display='none';inp.value='';autoSave();}}
 
 /* ═══ Interactions ═══ */
 function toggleFw(){const p=document.getElementById('fwPanel'),a=document.getElementById('fwArr');p.classList.toggle('open');a.classList.toggle('open');}
-function tog(btn){const w=btn.classList.contains('a');btn.parentElement.querySelectorAll('.cb').forEach(b=>b.classList.remove('a'));if(!w)btn.classList.add('a');updC();}
+function tog(btn){const w=btn.classList.contains('a');btn.parentElement.querySelectorAll('.cb').forEach(b=>b.classList.remove('a'));if(!w)btn.classList.add('a');autoSave();}
 function updC(){
   let y=0,p=0,n=0;document.querySelectorAll('tr[data-rk] .cb.a').forEach(b=>{if(b.classList.contains('y'))y++;else if(b.classList.contains('p'))p++;else if(b.classList.contains('n'))n++;});
   const t=+document.getElementById('zt').textContent;
   document.getElementById('zy').textContent=y;document.getElementById('zp').textContent=p;document.getElementById('zn').textContent=n;document.getElementById('zu').textContent=Math.max(0,t-y-p-n);
 }
-function addR(k){collect();const p=projects[curId];if(!p.rows[k])p.rows[k]={s:'',b:'',d:'',c:''};if(!p.rows[k].subs)p.rows[k].subs=[];p.rows[k].subs.push({s:'',b:'',d:'',c:''});localSave();renderTable();updC();}
-function rmR(btn){collect();const tr=btn.closest('tr'),k=tr.dataset.parent;let idx=0,nx=document.querySelector(`tr[data-rk="${k}"]`).nextElementSibling;while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}const p=projects[curId];if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);localSave();renderTable();updC();}
+function addR(k){collect();const p=projects[curId];if(!p.rows[k])p.rows[k]={s:'',b:'',d:'',c:''};if(!p.rows[k].subs)p.rows[k].subs=[];p.rows[k].subs.push({s:'',b:'',d:'',c:''});localSave();renderTable();updC();autoSave();}
+function rmR(btn){collect();const tr=btn.closest('tr'),k=tr.dataset.parent;let idx=0,nx=document.querySelector(`tr[data-rk="${k}"]`).nextElementSibling;while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}const p=projects[curId];if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);localSave();renderTable();updC();autoSave();}
 
 /* ═══ Settings ═══ */
 function showSettings(){
@@ -525,7 +529,8 @@ function saveSettings(){
 }
 
 /* ═══ Util ═══ */
-document.addEventListener('input',function(e){if(e.target.classList.contains('ef')){e.target.style.height='auto';e.target.style.height=Math.max(30,e.target.scrollHeight)+'px';}});
+document.addEventListener('input',function(e){if(e.target.classList.contains('ef')){e.target.style.height='auto';e.target.style.height=Math.max(30,e.target.scrollHeight)+'px';}if(editMode)autoSave();});
+document.addEventListener('change',function(e){if(editMode&&(e.target.classList.contains('bf')))autoSave();});
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function toast(msg){const t=document.createElement('div');t.textContent=msg;Object.assign(t.style,{position:'fixed',bottom:'60px',right:'16px',background:'#1e293b',color:'#fff',padding:'7px 16px',borderRadius:'6px',fontSize:'12px',fontWeight:'600',fontFamily:'inherit',zIndex:'200',boxShadow:'0 4px 12px rgba(0,0,0,.15)',opacity:'0',transition:'opacity .2s'});document.body.appendChild(t);requestAnimationFrame(()=>t.style.opacity='1');setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},1800);}
