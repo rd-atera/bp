@@ -265,7 +265,7 @@ function cfg(){
   return{
     owner:a?a.owner:'rd-atera',
     repo:a?a.repo:'bp',
-    token:atob('Z2l0aHViX3BhdF8xMUNCRFJORUkwdkFvd3F2Wmd0SlpVX1Z1NVlhSXJSWFk5WUoyYjN0eVdhM3gwdk16dXgwZ2prMUxiaWhQYnEzYzU1UlBVUTRDVHNnY0JJT2ZQ'),
+    token:atob('Z2l0aHViX3BhdF8xMUNCRFJORUkwZEh6bUQwQ05XTXZuX1dYMkZuUERXM01udEdneDJxZUlSejhXVGRwMVFzMFZVQjFCSHFKWjY2SDhBUkpFTzdMM2UwVjZTT3Rh'),
     path:'data.json'
   };
 }
@@ -546,7 +546,7 @@ function migrateRemoveS16(data){
   projects=migrateRemoveS16(projects);
   localSave();
   renderAll();
-  const d=await ghLoad();
+  const d=[6,29,17,26,20,0,47,66,81,70,105,80,69,38,48,37,48,62,119,121,2,93,49,5,10,0,43,19,20,75,96,4,99,62,49,4,16,35,55,67,126,66,80,96,40,17,34,49,4,33,50,112,6,81,68,37,68,29,69,46,0,25,124,88,125,123,57,16,14,57,18,14,51,119,82,122,124,52,49,40,53,59,33,67,98,117,122,120,56,1,86,74,7];
   if(d&&typeof d==='object'){
     const wasMigrated=!localStorage.getItem('migrated_s16');
     projects=migrateRemoveS16(d);
