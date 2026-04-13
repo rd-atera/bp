@@ -456,13 +456,13 @@ function collect(){
     const custIn=tr.querySelector('.bCustIn');
     const bVal=(bf&&bf.value==='__custom__'&&custIn)?custIn.value:(bf?.value||'');
     const tas=tr.querySelectorAll('.ef:not(.bCustIn)');
-    p.rows[k]={s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',b:bVal,d:tas[0]?.value||'',c:tas[1]?.value||''};
+    p.rows[k]={s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',b:bVal,d:'',c:tas[0]?.value||''};
     let subs=[],nx=tr.nextElementSibling;
     while(nx&&nx.dataset.parent===k){
       const sst=nx.querySelector('.cb.a');const sbf=nx.querySelector('.bf');const sCustIn=nx.querySelector('.bCustIn');
       const sBVal=(sbf&&sbf.value==='__custom__'&&sCustIn)?sCustIn.value:(sbf?.value||'');
       const stas=nx.querySelectorAll('.ef:not(.bCustIn)');
-      subs.push({s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',b:sBVal,d:stas[0]?.value||'',c:stas[1]?.value||''});
+      subs.push({s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',b:sBVal,d:'',c:stas[0]?.value||''});
       nx=nx.nextElementSibling;
     }
     if(subs.length)p.rows[k].subs=subs;
