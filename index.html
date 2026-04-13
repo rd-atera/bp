@@ -268,7 +268,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 <div class="sbar">
   <div class="stt"><span class="snm" id="zt">0</span><span class="sla">всего</span></div>
   <div class="stt"><span class="snm" id="zy" style="color:var(--yes)">0</span><span class="sla">выполняется</span></div>
-  <div class="stt"><span class="snm" id="zp" style="color:var(--pt)">0</span><span class="sla">частично</span></div>
+  <div class="stt"><span class="snm" id="zp" style="color:var(--pt)">0</span><span class="sla">частично вып.</span></div>
   <div class="stt"><span class="snm" id="zn" style="color:var(--no)">0</span><span class="sla">не выполняется</span></div>
   <div class="stt"><span class="snm" id="zu" style="color:var(--tx3)">0</span><span class="sla">не оценено</span></div>
 </div>
@@ -435,6 +435,10 @@ function delProject(id,e){
   delete projects[id];if(curId===id)curId=Object.keys(projects)[0]||null;
   localSave();renderAll();
 }
+function renProject(id,e){
+  e.stopPropagation();const n=prompt('Новое название:',projects[id].name);if(!n||!n.trim())return;
+  projects[id].name=n.trim();localSave();renderAll();autoSave();
+}
 
 /* ═══ Collect (ONLY in edit mode) ═══ */
 function collect(){
@@ -472,7 +476,7 @@ function renderAll(){renderPlist();renderHdr();renderTable();renderFb();updC();}
 function renderPlist(){
   const el=document.getElementById('plist'),ids=Object.keys(projects);
   if(!ids.length){el.innerHTML='<span style="font-size:11px;color:var(--tx3)">Нет проектов</span>';return;}
-  el.innerHTML=ids.map(id=>`<div class="pchip ${id===curId?'sel':''}" onclick="openProject('${id}')">${esc(projects[id].name)}<span class="x" onclick="delProject('${id}',event)">×</span></div>`).join('');
+  el.innerHTML=ids.map(id=>`<div class="pchip ${id===curId?'sel':''}" onclick="openProject('${id}')">${esc(projects[id].name)}<span class="x" onclick="renProject('${id}',event)" title="Переименовать">✎</span><span class="x" onclick="delProject('${id}',event)" title="Удалить">×</span></div>`).join('');
 }
 function renderHdr(){
   const el=document.getElementById('hdr');
@@ -516,7 +520,7 @@ function renderTable(){
   TPL.forEach((g,gi)=>{
     const gn=GN[g.cls];let gc=0;g.cats.forEach(c=>gc+=c.items.length);total+=gc;
     html+=`<div class="pg"><div class="gh ${g.cls}"><h2>${g.group}</h2><span class="gc">${gc}</span></div>`;
-    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th><th class="tc" style="width:100px">Статус</th><th style="width:165px">Ответственный блок</th><th style="width:195px">Комментарий</th></tr></thead><tbody>`;
+    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th><th class="tc" style="width:150px">Статус</th><th style="width:165px">Ответственный блок</th><th style="width:195px">Комментарий</th></tr></thead><tbody>`;
     let n=0;
     g.cats.forEach((cat,ci)=>{
       html+=`<tr class="cr ${g.cls}"><td colspan="5">${cat.name}</td></tr>`;
@@ -537,9 +541,9 @@ function renderTable(){
 function sCell(s){
   const ml='<span class="mob-label">Статус</span>';
   if(editMode)return`<td style="text-align:center;vertical-align:middle">${ml}<div class="ct"><button class="cb y ${s==='y'?'a':''}" onclick="tog(this)">✓</button><button class="cb p ${s==='p'?'a':''}" onclick="tog(this)">◐</button><button class="cb n ${s==='n'?'a':''}" onclick="tog(this)">✗</button></div></td>`;
-  if(s==='y')return`<td style="text-align:center">${ml}<span class="sb sy">Да</span></td>`;
-  if(s==='p')return`<td style="text-align:center">${ml}<span class="sb sp">Частично</span></td>`;
-  if(s==='n')return`<td style="text-align:center">${ml}<span class="sb sn">Нет</span></td>`;
+  if(s==='y')return`<td style="text-align:center">${ml}<span class="sb sy">Выполняется</span></td>`;
+  if(s==='p')return`<td style="text-align:center">${ml}<span class="sb sp">Частично выполняется</span></td>`;
+  if(s==='n')return`<td style="text-align:center">${ml}<span class="sb sn">Не выполняется</span></td>`;
   return`<td style="text-align:center">${ml}<span class="sb su">—</span></td>`;
 }
 function fCell(v,ph){
