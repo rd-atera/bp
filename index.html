@@ -189,8 +189,9 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
   .add-btn{font-size:10.5px;padding:5px 8px;margin-top:6px}
 
   /* Sub rows */
-  .sub-row{padding:6px 0 6px 24px!important;border-bottom:1px solid #eee!important;background:#fafafc!important}
+  .sub-row{padding:0!important;margin:0 12px;border:1px solid #e8e9ed!important;border-top:none!important;border-radius:0 0 6px 6px;background:#f6f7f9!important;margin-bottom:8px}
   .sub-row td{padding:3px 12px!important}
+  .sub-row td:first-child::before{content:'Доп. ответственный';display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--sp);margin-bottom:2px;margin-top:4px}
 }
 </style>
 </head>
@@ -530,7 +531,7 @@ function renderTable(){
         const subs=rd.subs||[];const rs=1+subs.length;
         html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${fCell(rd.c,'Комментарий')}</tr>`;
         subs.forEach(sr=>{
-          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}<td style="vertical-align:middle">${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
+          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}<td style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
         });
       });
     });
