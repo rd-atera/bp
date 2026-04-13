@@ -433,7 +433,7 @@ function openProject(id){curId=id;editMode=false;localSave();renderAll();}
 function delProject(id,e){
   e.stopPropagation();if(!confirm('Удалить «'+projects[id].name+'»?'))return;
   delete projects[id];if(curId===id)curId=Object.keys(projects)[0]||null;
-  localSave();renderAll();
+  localSave();renderAll();ghSave(projects).catch(()=>{});
 }
 function renProject(id,e){
   e.stopPropagation();const n=prompt('Новое название:',projects[id].name);if(!n||!n.trim())return;
