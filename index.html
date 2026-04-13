@@ -84,6 +84,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 
 .vt{font-size:11.5px;color:var(--tx2);line-height:1.35;min-height:18px}
 .vt.e{color:#ccc;font-style:italic}
+.mob-label{display:none}
 
 .add-btn{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;color:var(--tx3);background:none;border:1px dashed var(--brd);border-radius:3px;padding:2px 6px;cursor:pointer;margin-top:3px;font-family:inherit}
 .add-btn:hover{color:var(--tx2);border-color:#aeb4c0;background:#f4f5f7}
@@ -107,8 +108,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .sync.ok{background:#dcfce7;color:var(--yes)}.sync.err{background:#fee2e2;color:var(--no)}.sync.load{background:#fef3c7;color:var(--pt)}
 
 /* Debug bar */
-.dbg{background:#fffbeb;border-bottom:1px solid #fde68a;padding:6px 28px;font-size:10.5px;color:#92400e;font-weight:500;display:none}
-.dbg.show{display:block}
+.dbg{display:none!important}
 
 /* Framework diagram */
 .fw-toggle{background:var(--card);border-bottom:1px solid var(--brd);padding:8px 28px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
@@ -133,38 +133,64 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 @media(max-width:900px){
   .top,.hdr,.cnt,.lbar,.sbar,.plist,.fw-toggle,.fw-panel{padding-left:12px;padding-right:12px}
 }
-@media(max-width:600px){
-  .top{padding:10px 12px;gap:8px}
+@media(max-width:700px){
+  .top{padding:10px 12px;gap:6px}
   .top h1{font-size:14px}
   .top .sub{font-size:10px}
   .tbtn{padding:7px 10px;font-size:11px}
-  .plist{padding:8px 12px;gap:4px}
+  .plist{padding:8px 12px;gap:4px;overflow-x:auto}
   .pchip{font-size:11px;padding:5px 9px}
   .hdr{padding:10px 12px}
-  .hdr-row{gap:8px}
-  .hdr-row input{width:100%!important;font-size:12px}
-  .hdr-row label{font-size:9px}
-  .sbar{padding:8px 12px;gap:12px;flex-wrap:wrap}
+  .hdr-row{gap:4px;flex-direction:column;align-items:stretch}
+  .hdr-row input{width:100%!important;font-size:13px;padding:7px 10px}
+  .hdr-row label{font-size:9px;margin-top:6px}
+  .hdr-row span[style*="flex:1"]{display:none}
+  .sbar{padding:8px 12px;gap:8px;flex-wrap:wrap;justify-content:space-between}
+  .stt{min-width:0}
   .snm{font-size:15px}
-  .cnt{padding:10px 8px 80px}
-  .pg{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px}
-  .pt{min-width:580px}
-  .pt th{font-size:8.5px;padding:5px 6px}
-  .pt td{padding:5px 6px;font-size:11.5px}
-  .pn{font-size:11.5px}
-  .code{font-size:10px}
-  .sb{font-size:11px;padding:3px 8px}
-  .cb{width:30px;height:28px;font-size:14px}
-  .ef{font-size:12px;padding:5px 8px}
-  .bf{font-size:11px;padding:6px 8px}
-  .gh h2{font-size:12px}
-  .gh{padding:8px 12px}
-  .cr td{font-size:10.5px;padding:5px 8px}
-  .fb{bottom:10px;right:10px;left:10px;justify-content:center;flex-wrap:wrap;gap:5px}
-  .fb .tbtn{font-size:11px;padding:9px 12px;flex:1;justify-content:center;min-width:0}
+  .sla{font-size:8.5px}
+  .cnt{padding:10px 6px 90px}
+  .pg{margin-bottom:14px}
+  .gh h2{font-size:12.5px}
+  .gh{padding:9px 12px;border-radius:8px 8px 0 0}
   .fw-toggle{padding:8px 12px}
   .fw-toggle span{font-size:10.5px}
   .fw-toggle .hint{display:none}
+  .fb{bottom:8px;right:8px;left:8px;justify-content:center;flex-wrap:wrap;gap:5px}
+  .fb .tbtn{font-size:11.5px;padding:10px 10px;flex:1;justify-content:center;min-width:0;white-space:nowrap}
+
+  /* Card layout */
+  .pt{display:block;border-radius:0 0 8px 8px}
+  .pt thead{display:none}
+  .pt tbody{display:block}
+  .pt tr{display:block!important;border-bottom:1px solid var(--brd)}
+  .pt td{display:block!important;border:none!important;padding:3px 12px!important;text-align:left!important}
+  .pt td[rowspan]{border:none!important}
+  .cr td{padding:7px 12px!important;border-left:3px solid!important}
+  .cr.m td{border-left-color:var(--mg)!important}
+  .cr.s td{border-left-color:var(--sp)!important}
+  .cr.d td{border-left-color:var(--dv)!important}
+
+  /* Main data row */
+  .pt tr[data-rk]{padding:8px 0;border-bottom:1px solid var(--brd);background:#fff}
+  .pt tr[data-rk] td.code{font-size:11px;color:var(--tx3);padding-top:8px!important;padding-bottom:0!important}
+  .pn{font-size:13px;line-height:1.4}
+  .pt tr[data-rk] td:nth-child(2){padding-bottom:4px!important}
+
+  /* Labels before fields */
+  .mob-label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);margin-bottom:2px}
+
+  .sb{font-size:12px;padding:4px 10px}
+  .vt{font-size:12px;line-height:1.4}
+  .cb{width:34px;height:30px;font-size:15px}
+  .ct{justify-content:flex-start;gap:4px}
+  .ef{font-size:13px;padding:7px 9px;min-height:36px}
+  .bf{font-size:12px;padding:7px 9px}
+  .add-btn{font-size:10.5px;padding:5px 8px;margin-top:6px}
+
+  /* Sub rows */
+  .sub-row{padding:6px 0 6px 24px!important;border-bottom:1px solid #eee!important;background:#fafafc!important}
+  .sub-row td{padding:3px 12px!important}
 }
 </style>
 </head>
@@ -509,21 +535,24 @@ function renderTable(){
   root.innerHTML=html;document.getElementById('zt').textContent=total;
 }
 function sCell(s){
-  if(editMode)return`<td style="text-align:center;vertical-align:middle"><div class="ct"><button class="cb y ${s==='y'?'a':''}" onclick="tog(this)">✓</button><button class="cb p ${s==='p'?'a':''}" onclick="tog(this)">◐</button><button class="cb n ${s==='n'?'a':''}" onclick="tog(this)">✗</button></div></td>`;
-  if(s==='y')return'<td style="text-align:center"><span class="sb sy">Да</span></td>';
-  if(s==='p')return'<td style="text-align:center"><span class="sb sp">Частично</span></td>';
-  if(s==='n')return'<td style="text-align:center"><span class="sb sn">Нет</span></td>';
-  return'<td style="text-align:center"><span class="sb su">—</span></td>';
+  const ml='<span class="mob-label">Статус</span>';
+  if(editMode)return`<td style="text-align:center;vertical-align:middle">${ml}<div class="ct"><button class="cb y ${s==='y'?'a':''}" onclick="tog(this)">✓</button><button class="cb p ${s==='p'?'a':''}" onclick="tog(this)">◐</button><button class="cb n ${s==='n'?'a':''}" onclick="tog(this)">✗</button></div></td>`;
+  if(s==='y')return`<td style="text-align:center">${ml}<span class="sb sy">Да</span></td>`;
+  if(s==='p')return`<td style="text-align:center">${ml}<span class="sb sp">Частично</span></td>`;
+  if(s==='n')return`<td style="text-align:center">${ml}<span class="sb sn">Нет</span></td>`;
+  return`<td style="text-align:center">${ml}<span class="sb su">—</span></td>`;
 }
 function fCell(v,ph){
-  if(editMode)return`<td style="vertical-align:middle"><textarea class="ef" rows="1" placeholder="${ph}">${esc(v)}</textarea></td>`;
-  return`<td style="vertical-align:middle"><div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
+  const ml=`<span class="mob-label">${ph}</span>`;
+  if(editMode)return`<td style="vertical-align:middle">${ml}<textarea class="ef" rows="1" placeholder="${ph}">${esc(v)}</textarea></td>`;
+  return`<td style="vertical-align:middle">${ml}<div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
 const BLOCKS=['','Финансово-экономический блок','Центр бухгалтерского обслуживания','HR-блок','Блок ИТ','Блок безопасности','Блок закупок','Юридический блок','Блок «Девелопмент»','__custom__'];
 function bCell(v){
+  const ml='<span class="mob-label">Ответственный блок</span>';
   if(editMode){
     const isCustom=v&&!BLOCKS.includes(v);
-    let h='<td style="vertical-align:middle"><div>';
+    let h='<td style="vertical-align:middle">'+ml+'<div>';
     h+='<select class="bf" onchange="bCustToggle(this)">';
     h+='<option value="">— Выберите блок —</option>';
     BLOCKS.forEach(b=>{if(b&&b!=='__custom__')h+=`<option value="${esc(b)}"${v===b?' selected':''}>${esc(b)}</option>`;});
@@ -532,7 +561,7 @@ function bCell(v){
     h+=`<input class="ef bCustIn" style="margin-top:3px;${isCustom?'':'display:none;'}" placeholder="Введите название блока" value="${isCustom?esc(v):''}">`;
     h+='</div></td>';return h;
   }
-  return`<td style="vertical-align:middle"><div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
+  return`<td style="vertical-align:middle">${ml}<div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
 function bCustToggle(sel){const inp=sel.parentElement.querySelector('.bCustIn');if(sel.value==='__custom__'){inp.style.display='';inp.focus();}else{inp.style.display='none';inp.value='';autoSave();}}
 
