@@ -473,8 +473,10 @@ function collect(){
     while(nx&&nx.dataset.parent===k){
       const sst=nx.querySelector('.cb.a');const sbf=nx.querySelector('.bf');const sCustIn=nx.querySelector('.bCustIn');
       const sBVal=(sbf&&sbf.value==='__custom__'&&sCustIn)?sCustIn.value:(sbf?.value||'');
+      const srf=nx.querySelector('.rf');
+      const sRVal=srf?.value||'';
       const stas=nx.querySelectorAll('.ef:not(.bCustIn)');
-      subs.push({s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',b:sBVal,d:'',c:stas[0]?.value||''});
+      subs.push({s:sst?(sst.classList.contains('y')?'y':sst.classList.contains('p')?'p':'n'):'',b:sBVal,r:sRVal,d:'',c:stas[0]?.value||''});
       nx=nx.nextElementSibling;
     }
     if(subs.length)p.rows[k].subs=subs;
@@ -542,7 +544,7 @@ function renderTable(){
         const subs=rd.subs||[];const rs=1+subs.length;
         html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${rCell(rd.r)}${fCell(rd.c,'Комментарий')}</tr>`;
         subs.forEach(sr=>{
-          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}<td></td><td style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
+          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}${rCell(sr.r||'')}<td style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
         });
       });
     });
@@ -582,7 +584,7 @@ function bCell(v){
 function bCustToggle(sel){const inp=sel.parentElement.querySelector('.bCustIn');if(sel.value==='__custom__'){inp.style.display='';inp.focus();}else{inp.style.display='none';inp.value='';autoSave();}}
 const RDOCS=['','Есть утверждённый РД','РД отсутствует'];
 function rCell(v){
-  const ml='<span class="mob-label">РД</span>';
+  const ml='<span class="mob-label">Регулирующий документ</span>';
   if(editMode){
     let h='<td style="text-align:center;vertical-align:middle">'+ml+'<select class="rf" onchange="autoSave()">';
     h+='<option value="">— Выберите —</option>';
@@ -609,7 +611,7 @@ function updC(){
   const t=+document.getElementById('zt').textContent;
   document.getElementById('zy').textContent=y;document.getElementById('zp').textContent=p;document.getElementById('zn').textContent=n;document.getElementById('zu').textContent=Math.max(0,t-y-p-n);
 }
-function addR(k){collect();const p=projects[curId];if(!p.rows[k])p.rows[k]={s:'',b:'',d:'',c:''};if(!p.rows[k].subs)p.rows[k].subs=[];p.rows[k].subs.push({s:'',b:'',d:'',c:''});localSave();renderTable();updC();autoSave();}
+function addR(k){collect();const p=projects[curId];if(!p.rows[k])p.rows[k]={s:'',b:'',r:'',d:'',c:''};if(!p.rows[k].subs)p.rows[k].subs=[];p.rows[k].subs.push({s:'',b:'',r:'',d:'',c:''});localSave();renderTable();updC();autoSave();}
 function rmR(btn){collect();const tr=btn.closest('tr'),k=tr.dataset.parent;let idx=0,nx=document.querySelector(`tr[data-rk="${k}"]`).nextElementSibling;while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}const p=projects[curId];if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);localSave();renderTable();updC();autoSave();}
 
 /* ═══ Settings (removed — token is embedded) ═══ */
