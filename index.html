@@ -46,12 +46,12 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 
 .cnt{padding:16px 28px 60px;max-width:1520px}
 .pg{margin-bottom:22px}
-.gh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px 8px 0 0;color:#fff}
+.gh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px 8px 0 0;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,.15)}
 .gh.m{background:var(--mg)}.gh.s{background:var(--sp)}.gh.d{background:var(--dv)}
 .gh h2{font-size:13px;font-weight:700;flex:1}.gh .gc{font-size:10px;font-weight:600;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:12px}
 
-.pt{width:100%;border-collapse:collapse;background:var(--card);border-radius:0 0 8px 8px;overflow:hidden;box-shadow:var(--sh)}
-.pt th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);padding:7px 9px;text-align:left;border-bottom:2px solid var(--brd);background:#fafbfc}
+.pt{width:100%;border-collapse:collapse;background:var(--card);border-radius:0 0 8px 8px;box-shadow:var(--sh)}
+.pt th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);padding:7px 9px;text-align:left;border-bottom:2px solid var(--brd);background:#fafbfc;position:sticky;top:40px;z-index:9}
 .pt th.tc{text-align:center}
 .pt td{padding:6px 9px;border-bottom:1px solid var(--brd);font-size:12px;vertical-align:middle}
 .pt tr:last-child td{border-bottom:none}
@@ -79,8 +79,8 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .ef:hover{border-color:#aeb4c0}.ef:focus{border-color:#94a3b8;background:#fff}
 .ef::placeholder{color:#c5c9d2}
 
-.bf{width:100%;border:1px solid var(--brd);border-radius:4px;padding:5px 7px;font-family:inherit;font-size:11px;color:var(--tx2);background:#fafbfc;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237c8494'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
-.bf:hover{border-color:#aeb4c0}.bf:focus{border-color:#94a3b8;background:#fff}
+.bf,.rf{width:100%;border:1px solid var(--brd);border-radius:4px;padding:5px 7px;font-family:inherit;font-size:11px;color:var(--tx2);background:#fafbfc;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237c8494'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.bf:hover,.rf:hover{border-color:#aeb4c0}.bf:focus,.rf:focus{border-color:#94a3b8;background:#fff}
 
 .vt{font-size:11.5px;color:var(--tx2);line-height:1.35;min-height:18px}
 .vt.e{color:#ccc;font-style:italic}
@@ -123,11 +123,19 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .fw-note{display:none}
 
 @media print{
-  .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg,.dbg,.fw-toggle,.fw-panel{display:none!important}
+  .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg,.dbg,.fw-toggle{display:none!important}
+  .gh{position:static!important;box-shadow:none!important}
+  .pt th{position:static!important}
+  .fw-panel{display:block!important;padding:20px 14px;border:none;page-break-after:always}
+  .fw-svg-wrap{max-width:100%}
   .hdr{padding:10px 14px}.cnt{padding:6px 14px}
-  .pt td,.pt th{padding:3px 5px;font-size:9.5px}
-  .ef{min-height:14px;padding:1px 3px;font-size:9px;border:1px solid #ddd!important;background:#fff!important;overflow:visible!important;height:auto!important}
-  .bf{font-size:9px;padding:1px 3px;border:1px solid #ddd!important;background:#fff!important}
+  .pt td,.pt th{padding:3px 4px;font-size:8.5px}
+  .sb{font-size:8px;padding:1px 4px}
+  .pn{font-size:8.5px}
+  .code{font-size:8.5px}
+  .ef{min-height:14px;padding:1px 3px;font-size:8px;border:1px solid #ddd!important;background:#fff!important;overflow:visible!important;height:auto!important}
+  .bf,.rf{font-size:8px;padding:1px 3px;border:1px solid #ddd!important;background:#fff!important}
+  .mob-label{display:none!important}
   body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 @media(max-width:900px){
@@ -185,12 +193,13 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
   .cb{width:34px;height:30px;font-size:15px}
   .ct{justify-content:flex-start;gap:4px}
   .ef{font-size:13px;padding:7px 9px;min-height:36px}
-  .bf{font-size:12px;padding:7px 9px}
+  .bf,.rf{font-size:12px;padding:7px 9px}
   .add-btn{font-size:10.5px;padding:5px 8px;margin-top:6px}
 
   /* Sub rows */
   .sub-row{padding:0!important;margin:0 12px;border:1px solid #e8e9ed!important;border-top:none!important;border-radius:0 0 6px 6px;background:#f6f7f9!important;margin-bottom:8px}
   .sub-row td{padding:3px 12px!important}
+  .sub-row td:empty{display:none!important}
   .sub-row td:first-child::before{content:'Доп. ответственный';display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--sp);margin-bottom:2px;margin-top:4px}
 }
 </style>
@@ -288,7 +297,7 @@ function downloadPDF(){
   collect();const wasEdit=editMode;editMode=false;renderAll();
   const el=document.getElementById('C');
   const pName=curId&&projects[curId]?projects[curId].name:'checklist';
-  html2pdf().set({margin:[8,4,8,4],filename:'Чек-лист_БП_'+pName+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all','css','legacy']}}).from(el).save().then(()=>{editMode=wasEdit;renderAll();});
+  html2pdf().set({margin:[8,4,8,4],filename:'Чек-лист_БП_'+pName+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['avoid-all','css','legacy']}}).from(el).save().then(()=>{editMode=wasEdit;renderAll();});
 }
 /* ═══ Template ═══ */
 const TPL=[
@@ -456,8 +465,10 @@ function collect(){
     const bf=tr.querySelector('.bf');
     const custIn=tr.querySelector('.bCustIn');
     const bVal=(bf&&bf.value==='__custom__'&&custIn)?custIn.value:(bf?.value||'');
+    const rf=tr.querySelector('.rf');
+    const rVal=rf?.value||'';
     const tas=tr.querySelectorAll('.ef:not(.bCustIn)');
-    p.rows[k]={s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',b:bVal,d:'',c:tas[0]?.value||''};
+    p.rows[k]={s:st?(st.classList.contains('y')?'y':st.classList.contains('p')?'p':'n'):'',b:bVal,r:rVal,d:'',c:tas[0]?.value||''};
     let subs=[],nx=tr.nextElementSibling;
     while(nx&&nx.dataset.parent===k){
       const sst=nx.querySelector('.cb.a');const sbf=nx.querySelector('.bf');const sCustIn=nx.querySelector('.bCustIn');
@@ -521,17 +532,17 @@ function renderTable(){
   TPL.forEach((g,gi)=>{
     const gn=GN[g.cls];let gc=0;g.cats.forEach(c=>gc+=c.items.length);total+=gc;
     html+=`<div class="pg"><div class="gh ${g.cls}"><h2>${g.group}</h2><span class="gc">${gc}</span></div>`;
-    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:230px">Подпроцесс</th><th class="tc" style="width:150px">Статус</th><th style="width:165px">Ответственный блок</th><th style="width:195px">Комментарий</th></tr></thead><tbody>`;
+    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:200px">Подпроцесс</th><th class="tc" style="width:140px">Статус</th><th style="width:155px">Ответственный блок</th><th class="tc" style="width:140px">Регулирующий документ</th><th style="width:175px">Комментарий</th></tr></thead><tbody>`;
     let n=0;
     g.cats.forEach((cat,ci)=>{
-      html+=`<tr class="cr ${g.cls}"><td colspan="5">${cat.name}</td></tr>`;
+      html+=`<tr class="cr ${g.cls}"><td colspan="6">${cat.name}</td></tr>`;
       cat.items.forEach((item,ii)=>{
         n++;const code=gn+'.'+n,k=g.cls+'_'+n;
-        const rd=p.rows[k]||{s:'',b:'',d:'',c:''};
+        const rd=p.rows[k]||{s:'',b:'',d:'',c:'',r:''};
         const subs=rd.subs||[];const rs=1+subs.length;
-        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${fCell(rd.c,'Комментарий')}</tr>`;
+        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${rCell(rd.r)}${fCell(rd.c,'Комментарий')}</tr>`;
         subs.forEach(sr=>{
-          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}<td style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
+          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}<td></td><td style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
         });
       });
     });
@@ -569,6 +580,19 @@ function bCell(v){
   return`<td style="vertical-align:middle">${ml}<div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
 function bCustToggle(sel){const inp=sel.parentElement.querySelector('.bCustIn');if(sel.value==='__custom__'){inp.style.display='';inp.focus();}else{inp.style.display='none';inp.value='';autoSave();}}
+const RDOCS=['','Есть утверждённый РД','РД в работе','РД отсутствует'];
+function rCell(v){
+  const ml='<span class="mob-label">РД</span>';
+  if(editMode){
+    let h='<td style="text-align:center;vertical-align:middle">'+ml+'<select class="rf" onchange="autoSave()">';
+    h+='<option value="">— Выберите —</option>';
+    RDOCS.forEach(r=>{if(r)h+=`<option value="${esc(r)}"${v===r?' selected':''}>${esc(r)}</option>`;});
+    h+='</select></td>';return h;
+  }
+  if(!v)return`<td style="text-align:center;vertical-align:middle">${ml}<span class="sb su">—</span></td>`;
+  const cls=v.indexOf('утверж')>=0?'sy':v.indexOf('работе')>=0?'sp':'sn';
+  return`<td style="text-align:center;vertical-align:middle">${ml}<span class="sb ${cls}">${esc(v)}</span></td>`;
+}
 
 /* ═══ Interactions ═══ */
 function toggleFw(){const p=document.getElementById('fwPanel'),a=document.getElementById('fwArr');p.classList.toggle('open');a.classList.toggle('open');}
@@ -594,7 +618,7 @@ function closeModal(){document.getElementById('modalRoot').innerHTML='';}
 
 /* ═══ Util ═══ */
 document.addEventListener('input',function(e){if(e.target.classList.contains('ef')){e.target.style.height='auto';e.target.style.height=Math.max(30,e.target.scrollHeight)+'px';}if(editMode)autoSave();});
-document.addEventListener('change',function(e){if(editMode&&(e.target.classList.contains('bf')))autoSave();});
+document.addEventListener('change',function(e){if(editMode&&(e.target.classList.contains('bf')||e.target.classList.contains('rf')))autoSave();});
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function toast(msg){const t=document.createElement('div');t.textContent=msg;Object.assign(t.style,{position:'fixed',bottom:'60px',right:'16px',background:'#1e293b',color:'#fff',padding:'7px 16px',borderRadius:'6px',fontSize:'12px',fontWeight:'600',fontFamily:'inherit',zIndex:'200',boxShadow:'0 4px 12px rgba(0,0,0,.15)',opacity:'0',transition:'opacity .2s'});document.body.appendChild(t);requestAnimationFrame(()=>t.style.opacity='1');setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},1800);}
