@@ -297,7 +297,7 @@ function downloadPDF(){
   collect();const wasEdit=editMode;editMode=false;renderAll();
   const el=document.getElementById('C');
   const pName=curId&&projects[curId]?projects[curId].name:'checklist';
-  html2pdf().set({margin:[8,4,8,4],filename:'Чек-лист_БП_'+pName+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['avoid-all','css','legacy']}}).from(el).save().then(()=>{editMode=wasEdit;renderAll();});
+  html2pdf().set({margin:[8,4,8,4],filename:'Чек-лист_БП_'+pName+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all','css','legacy']}}).from(el).save().then(()=>{editMode=wasEdit;renderAll();});
 }
 /* ═══ Template ═══ */
 const TPL=[
@@ -580,7 +580,7 @@ function bCell(v){
   return`<td style="vertical-align:middle">${ml}<div class="vt ${v?'':'e'}">${esc(v)||'—'}</div></td>`;
 }
 function bCustToggle(sel){const inp=sel.parentElement.querySelector('.bCustIn');if(sel.value==='__custom__'){inp.style.display='';inp.focus();}else{inp.style.display='none';inp.value='';autoSave();}}
-const RDOCS=['','Есть утверждённый РД','РД в работе','РД отсутствует'];
+const RDOCS=['','Есть утверждённый РД','РД отсутствует'];
 function rCell(v){
   const ml='<span class="mob-label">РД</span>';
   if(editMode){
@@ -590,7 +590,7 @@ function rCell(v){
     h+='</select></td>';return h;
   }
   if(!v)return`<td style="text-align:center;vertical-align:middle">${ml}<span class="sb su">—</span></td>`;
-  const cls=v.indexOf('утверж')>=0?'sy':v.indexOf('работе')>=0?'sp':'sn';
+  const cls=v.indexOf('утверж')>=0?'sy':'sn';
   return`<td style="text-align:center;vertical-align:middle">${ml}<span class="sb ${cls}">${esc(v)}</span></td>`;
 }
 
