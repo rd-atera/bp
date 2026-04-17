@@ -88,7 +88,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 
 .add-btn{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;color:var(--tx3);background:none;border:1px dashed var(--brd);border-radius:3px;padding:2px 6px;cursor:pointer;margin-top:3px;font-family:inherit}
 .add-btn:hover{color:var(--tx2);border-color:#aeb4c0;background:#f4f5f7}
-.sub-row td{border-bottom:1px solid #eeeff2;background:#fafafc}
+.sub-row td{border-bottom:1px solid var(--brd);background:#fff}
 .rm-btn{font-size:14px;color:#ccc;cursor:pointer;border:none;background:none;padding:0 2px;font-family:inherit;line-height:1}
 .rm-btn:hover{color:var(--no)}
 
@@ -274,13 +274,19 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 <div class="plist" id="plist"></div>
 <div class="hdr" id="hdr" style="display:none"></div>
 
-<div class="lbar" style="display:none"></div>
 <div class="sbar">
-  <div class="stt"><span class="snm" id="zt">0</span><span class="sla">всего</span></div>
-  <div class="stt"><span class="snm" id="zy" style="color:var(--yes)">0</span><span class="sla">выполняется</span></div>
-  <div class="stt"><span class="snm" id="zp" style="color:var(--pt)">0</span><span class="sla">частично вып.</span></div>
-  <div class="stt"><span class="snm" id="zn" style="color:var(--no)">0</span><span class="sla">не выполняется</span></div>
-  <div class="stt"><span class="snm" id="zu" style="color:var(--tx3)">0</span><span class="sla">не оценено</span></div>
+  <span style="font-size:13px;font-weight:800;color:var(--ac)" id="zt_lbl">0 подпроцессов</span>
+  <span id="zt" style="display:none">0</span>
+  <div style="width:1px;height:20px;background:var(--brd);margin:0 2px"></div>
+  <div class="stt"><span class="snm" id="zy" style="color:var(--yes)">0%</span><span class="sla">выполняется</span></div>
+  <div class="stt"><span class="snm" id="zp" style="color:var(--pt)">0%</span><span class="sla">частично</span></div>
+  <div class="stt"><span class="snm" id="zn" style="color:var(--no)">0%</span><span class="sla">не выполняется</span></div>
+  <div style="flex:1"></div>
+  <div style="height:9px;border-radius:5px;background:#e5e7eb;overflow:hidden;display:flex;width:200px;align-self:center">
+    <div id="pb_y" style="height:100%;background:var(--yes);transition:width .3s"></div>
+    <div id="pb_p" style="height:100%;background:var(--pt);transition:width .3s"></div>
+    <div id="pb_n" style="height:100%;background:var(--no);transition:width .3s"></div>
+  </div>
 </div>
 
 <div class="cnt" id="C"></div>
@@ -320,7 +326,7 @@ const TPL=[
 {group:"3. ПРОЦЕССЫ РАЗВИТИЯ",cls:"d",cats:[
 {name:"Оптимизация бизнес-процессов",items:["Описание и регламентация процессов (as-is / to-be)","Реинжиниринг и устранение узких мест","Внутренний аудит бизнес-процессов и контроль соблюдения регламентов"]},
 {name:"Цифровизация и автоматизация",items:["Автоматизация учётных процессов (1С, БИТ.Финанс, интеграции)","Внедрение BI-аналитики и управленческих дашбордов","Электронный документооборот (ЭДО / КЭДО)","Цифровизация строительного контроля (мобильные решения, ПТО)"]},
-{name:"Инновации и R&D",items:["Внедрение новых технологий строительства","Развитие продуктовой линейки и стандартов качества"]},
+
 ]},
 ];
 const GN={m:1,s:2,d:3};
@@ -605,11 +611,19 @@ function updC(){
     const rows=projects[curId].rows||{};
     Object.values(rows).forEach(r=>{
       if(r.s==='y')y++;else if(r.s==='p')p++;else if(r.s==='n')n++;
-      if(r.subs)r.subs.forEach(sr=>{if(sr.s==='y')y++;else if(sr.s==='p')p++;else if(sr.s==='n')n++;});
+      (r.subs||[]).forEach(sr=>{if(sr.s==='y')y++;else if(sr.s==='p')p++;else if(sr.s==='n')n++;});
     });
   }
   const t=+document.getElementById('zt').textContent;
-  document.getElementById('zy').textContent=y;document.getElementById('zp').textContent=p;document.getElementById('zn').textContent=n;document.getElementById('zu').textContent=Math.max(0,t-y-p-n);
+  const evaluated=y+p+n;
+  const pct=v=>evaluated?Math.round(v/evaluated*100):0;
+  document.getElementById('zt_lbl').textContent=t+' подпроцессов';
+  document.getElementById('zy').textContent=pct(y)+'%';
+  document.getElementById('zp').textContent=pct(p)+'%';
+  document.getElementById('zn').textContent=pct(n)+'%';
+  document.getElementById('pb_y').style.width=pct(y)+'%';
+  document.getElementById('pb_p').style.width=pct(p)+'%';
+  document.getElementById('pb_n').style.width=pct(n)+'%';
 }
 function addR(k){collect();const p=projects[curId];if(!p.rows[k])p.rows[k]={s:'',b:'',r:'',d:'',c:''};if(!p.rows[k].subs)p.rows[k].subs=[];p.rows[k].subs.push({s:'',b:'',r:'',d:'',c:''});localSave();renderTable();updC();autoSave();}
 function rmR(btn){collect();const tr=btn.closest('tr'),k=tr.dataset.parent;let idx=0,nx=document.querySelector(`tr[data-rk="${k}"]`).nextElementSibling;while(nx&&nx!==tr){if(nx.dataset.parent===k)idx++;nx=nx.nextElementSibling;}const p=projects[curId];if(p.rows[k]?.subs)p.rows[k].subs.splice(idx,1);localSave();renderTable();updC();autoSave();}
