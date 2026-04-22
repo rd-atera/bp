@@ -418,7 +418,24 @@ async function ghSave(data){
     const body={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
     if(ghSha)body.sha=ghSha;
     const r=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!r.ok){const t=await r.text();dbg('❌ Сохранение: HTTP '+r.status+' '+t.substring(0,300));setSS('err','Ошибка '+r.status);return false;}
+    if(!r.ok){
+      const status=r.status;const t=await r.text();
+      if(status===422){
+        dbg('⚠️ 422 — устаревший SHA, перезапрашиваю и повторяю…');
+        ghSha=null;
+        try{
+          const gr2=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}});
+          if(gr2.ok){const gj2=await gr2.json();ghSha=gj2.sha;}
+        }catch(e){dbg('⚠️ SHA retry error: '+e.message);}
+        const body2={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
+        if(ghSha)body2.sha=ghSha;
+        const r2=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body2)});
+        if(!r2.ok){const t2=await r2.text();dbg('❌ Повторное сохранение: HTTP '+r2.status+' '+t2.substring(0,300));setSS('err','Ошибка '+r2.status);return false;}
+        const j2=await r2.json();ghSha=j2.content.sha;
+        dbg('✅ Сохранено (повтор)! SHA: '+ghSha.substring(0,8));setSS('ok','Сохранено ✓');setTimeout(()=>setSS('',''),3000);return true;
+      }
+      dbg('❌ Сохранение: HTTP '+status+' '+t.substring(0,300));setSS('err','Ошибка '+status);return false;
+    }
     const j=await r.json();
     ghSha=j.content.sha;
     dbg('✅ Сохранено! SHA: '+ghSha.substring(0,8));
