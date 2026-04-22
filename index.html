@@ -410,19 +410,14 @@ async function ghSave(data){
   const c=cfg();
   if(!c.owner||!c.repo||!c.token){dbg('❌ Сохранение невозможно: owner='+c.owner+' repo='+c.repo+' token='+(c.token?'есть':'НЕТ'));setSS('err','Нет токена');return false;}
   setSS('load','Сохранение…');
-  const pkeys=Object.keys(data);
-  let totalRows=0;
-  pkeys.forEach(pk=>{if(data[pk]&&data[pk].rows)totalRows+=Object.keys(data[pk].rows).length;});
-  dbg('⏳ Сохранение: '+pkeys.length+' проект(ов), '+totalRows+' строк → '+c.owner+'/'+c.repo+'/'+c.path);
   try{
     const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path}`;
-    if(!ghSha){
-      try{
-        const gr=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}});
-        if(gr.ok){const gj=await gr.json();ghSha=gj.sha;}
-        else{const t=await gr.text();dbg('⚠️ SHA fetch: HTTP '+gr.status+' '+t.substring(0,150));}
-      }catch(e){dbg('⚠️ SHA fetch error: '+e.message);}
-    }
+    // Always fetch fresh SHA before saving
+    ghSha=null;
+    const shaR=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'},cache:'no-store'});
+    if(shaR.ok){const shaJ=await shaR.json();ghSha=shaJ.sha;dbg('SHA получен: '+ghSha.substring(0,8));}
+    else if(shaR.status===404){dbg('data.json не существует — создаём новый файл');}
+    else{const t=await shaR.text();dbg('⚠️ SHA fetch HTTP '+shaR.status+': '+t.substring(0,150));setSS('err','Ошибка '+shaR.status);return false;}
     const jsonStr=JSON.stringify(data,null,2);
     const bytes=new TextEncoder().encode(jsonStr);
     let bin='';for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
@@ -430,33 +425,11 @@ async function ghSave(data){
     const body={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
     if(ghSha)body.sha=ghSha;
     const r=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!r.ok){
-      const status=r.status;const t=await r.text();
-      if(status===422){
-        dbg('⚠️ 422 — устаревший SHA, перезапрашиваю и повторяю…');
-        ghSha=null;
-        try{
-          const gr2=await fetch(url,{headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}});
-          if(gr2.ok){const gj2=await gr2.json();ghSha=gj2.sha;}
-        }catch(e){dbg('⚠️ SHA retry error: '+e.message);}
-        const body2={message:'Обновление чек-листа БП — '+new Date().toLocaleString('ru'),content:b64};
-        if(ghSha)body2.sha=ghSha;
-        const r2=await fetch(url,{method:'PUT',headers:{'Authorization':'token '+c.token,'Content-Type':'application/json'},body:JSON.stringify(body2)});
-        if(!r2.ok){const t2=await r2.text();dbg('❌ Повторное сохранение: HTTP '+r2.status+' '+t2.substring(0,300));setSS('err','Ошибка '+r2.status);return false;}
-        const j2=await r2.json();ghSha=j2.content.sha;
-        dbg('✅ Сохранено (повтор)! SHA: '+ghSha.substring(0,8));setSS('ok','Сохранено ✓');setTimeout(()=>setSS('',''),3000);return true;
-      }
-      dbg('❌ Сохранение: HTTP '+status+' '+t.substring(0,300));setSS('err','Ошибка '+status);return false;
-    }
-    const j=await r.json();
-    ghSha=j.content.sha;
-    dbg('✅ Сохранено! SHA: '+ghSha.substring(0,8));
-    setSS('ok','Сохранено ✓');
-    setTimeout(()=>setSS('',''),3000);
-    return true;
+    if(!r.ok){const t=await r.text();dbg('❌ Сохранение: HTTP '+r.status+' '+t.substring(0,300));setSS('err','Ошибка '+r.status);return false;}
+    const j=await r.json();ghSha=j.content.sha;
+    dbg('✅ Сохранено! SHA: '+ghSha.substring(0,8));setSS('ok','Сохранено ✓');setTimeout(()=>setSS('',''),3000);return true;
   }catch(e){dbg('❌ Сеть: '+e.message);setSS('err',e.message);return false;}
 }
-
 function setSS(t,m){const el=document.getElementById('syncStatus');if(!m){el.innerHTML='';return;}el.innerHTML=`<span class="sync ${t}">${m}</span>`;}
 
 /* ═══ State ═══ */
