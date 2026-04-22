@@ -297,7 +297,19 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 <script>
 /* ═══ Auto-save ═══ */
 let _saveTm=null;
-function autoSave(){collect();updC();clearTimeout(_saveTm);_saveTm=setTimeout(()=>{ghSave(projects).catch(()=>{});},2000);}
+let _saving=false;
+let _savePending=false;
+function autoSave(){
+  collect();updC();
+  clearTimeout(_saveTm);
+  _saveTm=setTimeout(async()=>{
+    if(_saving){_savePending=true;return;}
+    _saving=true;
+    try{await ghSave(projects);}catch(e){}
+    _saving=false;
+    if(_savePending){_savePending=false;autoSave();}
+  },2000);
+}
 /* ═══ PDF Download ═══ */
 function downloadPDF(){
   collect();const wasEdit=editMode;editMode=false;renderAll();
