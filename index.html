@@ -49,6 +49,7 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .gh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px 8px 0 0;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,.15)}
 .gh.m{background:var(--mg)}.gh.s{background:var(--sp)}.gh.d{background:var(--dv)}
 .gh h2{font-size:13px;font-weight:700;flex:1}.gh .gc{font-size:10px;font-weight:600;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:12px}
+.gh-print{display:none}
 
 .pt{width:100%;border-collapse:collapse;background:var(--card);border-radius:0 0 8px 8px;box-shadow:var(--sh)}
 .pt th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);padding:7px 9px;text-align:left;border-bottom:2px solid var(--brd);background:#fafbfc;position:sticky;top:40px;z-index:9}
@@ -122,21 +123,32 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 .fw-svg-wrap{max-width:960px;margin:0 auto}
 .fw-note{display:none}
 
+@page{size:A4 portrait;margin:12mm 10mm}
 @media print{
-  .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg,.dbg,.fw-toggle{display:none!important}
-  .gh{position:static!important;box-shadow:none!important}
-  .pt th{position:static!important}
-  .fw-panel{display:block!important;padding:20px 14px;border:none;page-break-after:always}
-  .fw-svg-wrap{max-width:100%}
-  .hdr{padding:10px 14px}.cnt{padding:6px 14px}
-  .pt td,.pt th{padding:3px 4px;font-size:8.5px}
-  .sb{font-size:8px;padding:1px 4px}
-  .pn{font-size:8.5px}
-  .code{font-size:8.5px}
-  .ef{min-height:14px;padding:1px 3px;font-size:8px;border:1px solid #ddd!important;background:#fff!important;overflow:visible!important;height:auto!important}
-  .bf,.rf{font-size:8px;padding:1px 3px;border:1px solid #ddd!important;background:#fff!important}
-  .mob-label{display:none!important}
   body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .top,.plist,.fb,.add-btn,.rm-btn,.modal-bg,.dbg,.fw-toggle,.fw-panel,.hdr,.sbar,.lbar{display:none!important}
+  .gh{display:none!important}
+  .c-col{display:none!important}
+  .gh-print{display:table-row!important}
+  .gh-print.m td{background:var(--mg)!important;color:#fff!important}
+  .gh-print.s td{background:var(--sp)!important;color:#fff!important}
+  .gh-print.d td{background:var(--dv)!important;color:#fff!important}
+  .gh-print td{font-size:10px!important;font-weight:800!important;padding:5px 6px!important;color:#fff!important}
+  .cnt{padding:0;max-width:100%}
+  .pg{margin-bottom:4px;page-break-inside:auto}
+  table.pt{width:100%;table-layout:auto;border-collapse:collapse;page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  .pt th{position:static!important;font-size:7.5px!important;padding:3px 5px!important;background:#f0f1f4!important;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .pt td{padding:3px 5px;font-size:8px;vertical-align:middle;border-bottom:1px solid #ddd}
+  .sb{font-size:7.5px!important;padding:1px 4px!important}
+  .pn{font-size:8px}
+  .code{font-size:7.5px;white-space:nowrap}
+  .ef,.bf,.rf{display:none!important}
+  .vt{font-size:8px}
+  .vt.e{display:none}
+  .cr td{font-size:7.5px!important;padding:3px 5px!important}
+  .mob-label{display:none!important}
 }
 @media(max-width:900px){
   .top,.hdr,.cnt,.lbar,.sbar,.plist,.fw-toggle,.fw-panel{padding-left:12px;padding-right:12px}
@@ -293,7 +305,6 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--bg);color:v
 <div class="fb" id="fb"></div>
 <div id="modalRoot"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 /* ═══ Auto-save ═══ */
 let _saveTm=null;
@@ -313,9 +324,13 @@ function autoSave(){
 /* ═══ PDF Download ═══ */
 function downloadPDF(){
   collect();const wasEdit=editMode;editMode=false;renderAll();
-  const el=document.getElementById('C');
-  const pName=curId&&projects[curId]?projects[curId].name:'checklist';
-  html2pdf().set({margin:[8,4,8,4],filename:'Чек-лист_БП_'+pName+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all','css','legacy']}}).from(el).save().then(()=>{editMode=wasEdit;renderAll();});
+  const pName=curId&&projects[curId]?projects[curId].name:'Чек-лист_БП';
+  const prevTitle=document.title;
+  document.title='Чек-лист_БП_'+pName;
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{document.title=prevTitle;editMode=wasEdit;renderAll();},500);
+  },300);
 }
 /* ═══ Template ═══ */
 const TPL=[
@@ -542,7 +557,7 @@ function renderTable(){
   TPL.forEach((g,gi)=>{
     const gn=GN[g.cls];let gc=0;g.cats.forEach(c=>gc+=c.items.length);total+=gc;
     html+=`<div class="pg"><div class="gh ${g.cls}"><h2>${g.group}</h2><span class="gc">${gc}</span></div>`;
-    html+=`<table class="pt"><thead><tr><th class="tc" style="width:48px">№</th><th style="min-width:200px">Подпроцесс</th><th class="tc" style="width:140px">Статус</th><th style="width:155px">Ответственный блок</th><th class="tc" style="width:140px">Регулирующий документ</th><th style="width:175px">Комментарий</th></tr></thead><tbody>`;
+    html+=`<table class="pt"><thead><tr class="gh-print ${g.cls}"><td colspan="6" style="color:#fff">${g.group}</td></tr><tr><th class="tc" style="width:48px">№</th><th style="min-width:200px">Подпроцесс</th><th class="tc" style="width:140px">Статус</th><th style="width:155px">Ответственный блок</th><th class="tc" style="width:140px">Регулирующий документ</th><th class="c-col" style="width:175px">Комментарий</th></tr></thead><tbody>`;
     let n=0;
     g.cats.forEach((cat,ci)=>{
       html+=`<tr class="cr ${g.cls}"><td colspan="6">${cat.name}</td></tr>`;
@@ -550,9 +565,9 @@ function renderTable(){
         n++;const code=gn+'.'+n,k=g.cls+'_'+n;
         const rd=p.rows[k]||{s:'',b:'',d:'',c:'',r:''};
         const subs=rd.subs||[];const rs=1+subs.length;
-        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${rCell(rd.r)}${fCell(rd.c,'Комментарий')}</tr>`;
+        html+=`<tr data-rk="${k}"><td class="code" data-k="${k}" rowspan="${rs}">${code}</td><td style="vertical-align:middle" data-k="${k}" rowspan="${rs}"><div class="pn">${item}</div>${editMode?`<button class="add-btn" onclick="addR('${k}')">＋ ещё ответственный</button>`:''}</td>${sCell(rd.s)}${bCell(rd.b)}${rCell(rd.r)}<td class="c-col" style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<textarea class="ef" rows="1" placeholder="Комментарий">${esc(rd.c)}</textarea>`:`<div class="vt ${rd.c?'':'e'}">${esc(rd.c)||'—'}</div>`}</td></tr>`;
         subs.forEach(sr=>{
-          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}${rCell(sr.r||'')}<td style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
+          html+=`<tr class="sub-row" data-parent="${k}">${sCell(sr.s)}${bCell(sr.b)}${rCell(sr.r||'')}<td class="c-col" style="vertical-align:middle"><span class="mob-label">Комментарий</span>${editMode?`<div style="display:flex;gap:3px;align-items:start"><textarea class="ef" rows="1" placeholder="Комментарий">${esc(sr.c)}</textarea><button class="rm-btn" onclick="rmR(this)">×</button></div>`:`<div class="vt ${sr.c?'':'e'}">${esc(sr.c)||'—'}</div>`}</td></tr>`;
         });
       });
     });
